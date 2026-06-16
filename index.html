@@ -3,45 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StudyMartin — Computer Security Study Platform</title>
+<title>StudyMartin</title>
 <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: { extend: {
-    colors: { brand: {50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e'} },
-    fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
-  } }
-};
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-html,body{height:100%;}
-body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-.animate-fadeIn{animation:fadeIn .4s ease both}
-.animate-slideUp{animation:slideUp .45s ease both}
-.animate-pop{animation:pop .35s ease}
-.animate-shake{animation:shake .4s ease}
-.hero-bg{background:linear-gradient(135deg,#e0f2fe 0%,#f0f9ff 45%,#ecfeff 100%)}
-.dark .hero-bg{background:linear-gradient(135deg,rgba(14,165,233,.16) 0%,rgba(2,132,199,.10) 50%,rgba(8,47,73,.30) 100%)}
-.gradient-text{background:linear-gradient(90deg,#0ea5e9,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}
-::selection{background:#bae6fd;color:#0c4a6e}
-.card-hover{transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
-.card-hover:hover{transform:translateY(-4px)}
-*{scrollbar-width:thin}
-</style>
+<script>tailwind.config={darkMode:"class",theme:{extend:{colors:{brand:{50:"#f0f9ff",100:"#e0f2fe",200:"#bae6fd",300:"#7dd3fc",400:"#38bdf8",500:"#0ea5e9",600:"#0284c7",700:"#0369a1",800:"#075985",900:"#0c4a6e"}},fontFamily:{sans:["Inter","system-ui","-apple-system","Segoe UI","Roboto","sans-serif"]}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>html,body{height:100%}body{font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}.animate-fadeIn{animation:fadeIn .4s ease both}.animate-slideUp{animation:slideUp .45s ease both}.animate-pop{animation:pop .35s ease}.animate-shake{animation:shake .4s ease}.hero-bg{background:linear-gradient(135deg,#e0f2fe 0%,#f0f9ff 45%,#ecfeff 100%)}.dark .hero-bg{background:linear-gradient(135deg,rgba(14,165,233,.16) 0%,rgba(2,132,199,.10) 50%,rgba(8,47,73,.30) 100%)}.gradient-text{background:linear-gradient(90deg,#0ea5e9,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}::selection{background:#bae6fd;color:#0c4a6e}.card-hover{transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}.card-hover:hover{transform:translateY(-4px)}*{scrollbar-width:thin}</style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
 <div id="root"></div>
-​
 <script>
 /* Full, detailed study-guide content for all 4 chapters. */
 window.CHAPTERS = [];
@@ -729,9 +701,7 @@ window.CHAPTERS.push({
     ]}
   ]
 });
-​
 </script>
-​
 <script>
 /* MCQ bank. Options carry NO letter prefixes; the UI renders A./B./C./D. answer = 0-based index of correct option. */
 window.QUESTIONS = { ch1: [], ch2: [], ch3: [], ch4: [], final: [] };
@@ -1011,11 +981,8 @@ window.QUESTIONS.final = [
 window.QUESTIONS.ch4.push(
 {q:"Which statement about substitution versus transposition ciphers is correct?",options:["Both rearrange letter positions only","Substitution changes symbols; transposition reorders them","Both change the symbols themselves","Transposition uses a public key"],answer:1,explanation:"Substitution replaces each symbol with another, while transposition keeps the symbols but rearranges their positions."}
 );
-​
 </script>
-​
 <script type="text/babel">
-​
 const {useState,useEffect,useRef,useMemo} = React;
 ​
 const CHAPTERS = window.CHAPTERS || [];
@@ -1405,8 +1372,6 @@ function App(){
 }
 ​
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-​
 </script>
 </body>
 </html>
-​
