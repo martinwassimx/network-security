@@ -1,140 +1,1411 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>StudyMartin</title>
-<style>
-  body { margin: 0; font-family: system-ui, sans-serif; }
-  #loading { display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; background: #f8fafc; }
-  #loading h2 { color: #0ea5e9; margin: 0 0 1rem 0; }
-  #loading p { color: #64748b; margin: 0.5rem 0; }
-  .spinner { border: 4px solid #e0f2fe; border-top: 4px solid #0ea5e9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  #error { display: none; color: #dc2626; background: #fee; padding: 1rem; margin: 1rem; border-radius: 8px; }
-</style>
-</head>
-<body>
-<div id="loading">
-  <div class="spinner"></div>
-  <h2>Loading StudyMartin...</h2>
-  <p id="status">Initializing libraries...</p>
-</div>
-<div id="error"></div>
-<div id="root"></div>
-​
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyMartin — Computer Security Study Platform</title>
+<script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
-  window.onerror = function(msg, url, line, col, error) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error').style.display = 'block';
-    document.getElementById('error').innerHTML = '<strong>Error:</strong> ' + msg + '<br>Line: ' + line + '<br><br>Please check that you have an internet connection and try refreshing the page.';
-    console.error('Global error:', msg, error);
-    return false;
-  };
-  
-  function updateStatus(msg) {
-    var el = document.getElementById('status');
-    if (el) el.textContent = msg;
-    console.log('Status:', msg);
-  }
-</script>
-​
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin onload="updateStatus('React loaded')"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin onload="updateStatus('ReactDOM loaded')"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin onload="updateStatus('Babel loaded')"></script>
-<script src="https://cdn.tailwindcss.com" onload="updateStatus('Tailwind loaded')"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: { extend: {
-      colors: { brand: {50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e'} },
-      fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
-    } }
-  };
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: {
+    colors: { brand: {50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e'} },
+    fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] }
+  } }
+};
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  html,body{height:100%;}
-  body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
-  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-  .animate-fadeIn{animation:fadeIn .4s ease both}
-  .animate-slideUp{animation:slideUp .45s ease both}
-  .animate-pop{animation:pop .35s ease}
-  .animate-shake{animation:shake .4s ease}
-  .hero-bg{background:linear-gradient(135deg,#e0f2fe 0%,#f0f9ff 45%,#ecfeff 100%)}
-  .dark .hero-bg{background:linear-gradient(135deg,rgba(14,165,233,.16) 0%,rgba(2,132,199,.10) 50%,rgba(8,47,73,.30) 100%)}
-  .gradient-text{background:linear-gradient(90deg,#0ea5e9,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}
-  ::selection{background:#bae6fd;color:#0c4a6e}
-  .card-hover{transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
-  .card-hover:hover{transform:translateY(-4px)}
-  *{scrollbar-width:thin}
+html,body{height:100%;}
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.animate-fadeIn{animation:fadeIn .4s ease both}
+.animate-slideUp{animation:slideUp .45s ease both}
+.animate-pop{animation:pop .35s ease}
+.animate-shake{animation:shake .4s ease}
+.hero-bg{background:linear-gradient(135deg,#e0f2fe 0%,#f0f9ff 45%,#ecfeff 100%)}
+.dark .hero-bg{background:linear-gradient(135deg,rgba(14,165,233,.16) 0%,rgba(2,132,199,.10) 50%,rgba(8,47,73,.30) 100%)}
+.gradient-text{background:linear-gradient(90deg,#0ea5e9,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}
+::selection{background:#bae6fd;color:#0c4a6e}
+.card-hover{transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.card-hover:hover{transform:translateY(-4px)}
+*{scrollbar-width:thin}
 </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+<div id="root"></div>
 ​
 <script>
-updateStatus('Loading chapter data...');
-window.CHAPTERS = [{id:'ch1',num:1,title:'Chapter 1',subtitle:'Test',readMins:10,sections:[{type:'intro',text:'Test chapter'}]}];
-updateStatus('Loading question data...');
-window.QUESTIONS = {ch1:[{q:'Test?',options:['A','B','C','D'],answer:0,explanation:'Test'}],final:[]};
-updateStatus('Data loaded, starting app...');
+/* Full, detailed study-guide content for all 4 chapters. */
+window.CHAPTERS = [];
+​
+window.CHAPTERS.push({
+  id: "ch1",
+  num: 1,
+  title: "Introduction to Network & Information Security",
+  subtitle: "Foundations: the CIA triad, threats, vulnerabilities, risk, policy vs. mechanism, and trust.",
+  readMins: 24,
+  sections: [
+    {type:"intro", text:"Everything else in this course rests on this chapter. Before you can defend a system you must be able to answer three questions precisely: what are you protecting (the assets and their security properties), what are you protecting them from (threats, vulnerabilities, and attackers), and what does the word secure actually mean. This guide expands every idea well beyond the slides, defines each term formally, and gives concrete examples so the concepts truly click."},
+​
+    {type:"h2", text:"1. What Is Computer Security?"},
+    {type:"definition", term:"Computer Security", text:"The protection of computing systems and the information they store, process, and transmit against unauthorized access, modification, disclosure, or destruction. It spans hardware, software, networks, data, and the people who use them."},
+    {type:"p", text:"Security is not a single product you buy and install. It is the combination of three layers working together: technical safeguards (encryption, firewalls, authentication), organizational measures (policies and procedures everyone must follow), and human awareness (training people not to fall for social engineering). A system is only as strong as the weakest of these layers, which is why we describe security as holistic."},
+    {type:"p", text:"Security is also a continuous process, not a one-time state. New vulnerabilities are discovered, attackers change tactics, and systems evolve. A configuration that is secure today can become insecure tomorrow, so security must be monitored, reviewed, and updated continuously."},
+    {type:"callout", tone:"important", title:"The core promise of security", text:"Security guarantees three things simultaneously: secret data stays secret, trustworthy data stays trustworthy, and systems stay usable when needed. Those three goals are the CIA triad, and they are the backbone of the entire field."},
+​
+    {type:"h2", text:"2. The CIA Triad \u2014 The Cornerstone of Security"},
+    {type:"p", text:"Every security control you will ever meet exists to protect at least one of three properties: Confidentiality, Integrity, and Availability. Each is defined relative to a set of entities X (the people or processes the property is measured against) and some information or resource I."},
+​
+    {type:"h3", text:"Confidentiality"},
+    {type:"definition", term:"Confidentiality (formal)", text:"Let X be a set of entities and let I be some information. I has the property of confidentiality with respect to X if no member of X can obtain information about I."},
+    {type:"p", text:"Confidentiality prevents unauthorized disclosure. It covers both direct leakage (someone simply reading a file they should not) and information flow (data leaking indirectly through a side channel, even without transferring access rights). The set X is often implicit \u2014 for example, everyone not cleared to read a classified document."},
+    {type:"p", text:"Authorization can change over time (temporal authorization). A contractor may be allowed to read proprietary data while a non-disclosure agreement is in force, and lose that access the moment the agreement expires."},
+    {type:"callout", tone:"note", title:"Key insight", text:"Confidentiality says nothing about whether information is correct \u2014 only about who is allowed to access it. Correctness is the job of integrity."},
+    {type:"example", title:"Confidentiality in everyday life", text:"Encrypting a laptop so a thief who steals it cannot read your files, or using file permissions so other users on a shared server cannot open your documents."},
+​
+    {type:"h3", text:"Integrity"},
+    {type:"definition", term:"Integrity (formal)", text:"Let X be a set of entities and let I be information or a resource. I has the property of integrity with respect to X if all members of X trust I \u2014 including its storage, its conveyance, and its correctness."},
+    {type:"list", title:"Integrity has three facets", items:[
+      "Data integrity: the content itself has not been altered during storage or transmission \u2014 it matches what was originally stored or sent.",
+      "Origin integrity (authentication): the source of the information is genuine and has not been forged, tampered with, or misrepresented.",
+      "Assurance: resources behave correctly according to their specification, extending integrity to software, hardware, and system behavior."
+    ]},
+    {type:"callout", tone:"note", title:"Why integrity is harder than confidentiality", text:"Assigning a level of confidence is subjective. A new software release from a trusted vendor may still contain unknown bugs. The level of trust depends on a subjective belief about trustworthiness, not just on a classification label."},
+​
+    {type:"h3", text:"Availability"},
+    {type:"definition", term:"Availability (formal)", text:"Let X be a set of entities and let I be a resource. I has the property of availability with respect to X if all members of X can access I."},
+    {type:"p", text:"The meaning of access varies critically by context, and the required quality of service must be stated explicitly in the security policy. Denial-of-service attacks specifically target availability."},
+    {type:"example", title:"Context changes the requirement", text:"A book-selling server that takes up to 1 hour to process a purchase may still satisfy its availability requirement (low urgency). An emergency medical server that takes 1 hour to answer an allergy query in the ER fails completely \u2014 lives are at stake and responses must take under a minute."},
+    {type:"table", title:"CIA triad at a glance", headers:["Property","Protects against","Question it answers","Example control"], rows:[
+      ["Confidentiality","Unauthorized disclosure","Who may read it?","Encryption, access permissions"],
+      ["Integrity","Unauthorized or accidental modification","Can I trust it?","Hashes, digital signatures, checksums"],
+      ["Availability","Disruption / denial of service","Can I use it when needed?","Redundancy, backups, DoS protection"]
+    ]},
+​
+    {type:"h2", text:"3. Threats \u2014 The Four Broad Classes"},
+    {type:"definition", term:"Threat", text:"A potential violation of security \u2014 a possible danger that might exploit a vulnerability to cause harm. The actual action that carries out the threat is called an attack, and the entity performing it is a threat agent or attacker."},
+    {type:"p", text:"Bishop groups threats into four broad classes based on what the attacker is trying to do. Memorize these four; many specific attacks are just instances of them."},
+    {type:"list", ordered:true, title:"The four threat classes", items:[
+      "Disclosure: unauthorized access to information (attacks against confidentiality). The classic example is snooping \u2014 passive interception or eavesdropping on data.",
+      "Deception: acceptance of false data (attacks against integrity). Examples: modification of data, spoofing (impersonation), repudiation of origin (falsely denying you sent something), and denial of receipt (falsely denying you received something).",
+      "Disruption: interruption or prevention of correct operation (attacks against availability/integrity). Examples: modification of data in transit, man-in-the-middle, delay, and denial of service.",
+      "Usurpation: unauthorized control of part of a system (attacks against integrity/availability). Examples: spoofing, modification, delay, and denial of service used to seize control."
+    ]},
+    {type:"table", title:"Common attacks mapped to threat classes", headers:["Attack","What it does","Threat class","CIA property hit"], rows:[
+      ["Snooping / eavesdropping","Passively intercepts data","Disclosure","Confidentiality"],
+      ["Modification / alteration","Changes data in storage or transit","Deception / Disruption","Integrity"],
+      ["Spoofing / masquerade","Impersonates another entity","Deception / Usurpation","Integrity"],
+      ["Repudiation of origin","Sender falsely denies sending","Deception","Integrity"],
+      ["Denial of receipt","Receiver falsely denies receiving","Deception","Integrity / Availability"],
+      ["Delay","Slows a service past usefulness","Disruption / Usurpation","Availability"],
+      ["Denial of service (DoS)","Blocks legitimate access","Disruption / Usurpation","Availability"]
+    ]},
+​
+    {type:"h2", text:"4. Vulnerabilities, Attacks, and Risk"},
+    {type:"definition", term:"Vulnerability", text:"A weakness in a system \u2014 in its design, implementation, configuration, or operation \u2014 that can be exploited to violate the security policy."},
+    {type:"definition", term:"Attack", text:"The deliberate action of exploiting a vulnerability to carry out a threat."},
+    {type:"definition", term:"Risk", text:"A measure of the likelihood that a threat will exploit a vulnerability, combined with the impact (cost) if it succeeds. Risk is what security management actually tries to reduce."},
+    {type:"formula", title:"The risk relationship", lines:["Risk = f( Threat, Vulnerability, Impact )"], caption:"If any factor is zero (no threat, no vulnerability, or no impact) the risk effectively disappears. Security controls work by reducing one or more of these factors."},
+    {type:"p", text:"Because removing all risk is impossible and expensive, organizations practice risk management: identify assets, estimate threats and vulnerabilities, and apply controls where the reduction in risk justifies the cost."},
+​
+    {type:"h2", text:"5. Policy vs. Mechanism \u2014 A Critical Distinction"},
+    {type:"definition", term:"Security Policy", text:"A statement of what is and is not allowed \u2014 the rules that define authorized (secure) versus unauthorized (nonsecure) behavior and states."},
+    {type:"definition", term:"Security Mechanism", text:"A method, tool, or procedure that enforces some part of the security policy \u2014 how the rules are actually implemented."},
+    {type:"comparison", title:"Policy vs. Mechanism", left:{title:"Policy (the what)", points:[
+      "Defines authorized vs. unauthorized states",
+      "May be formal or informal",
+      "Context-dependent: differs by site and organization",
+      "Can be implicit or explicit",
+      "Example: No student may copy another student's homework"
+    ]}, right:{title:"Mechanism (the how)", points:[
+      "Enforces the policy in practice",
+      "File permissions (chmod, ACLs)",
+      "Firewalls and packet filters",
+      "Physical locks and cryptographic protocols",
+      "Example: File permissions that block reading another user's homework file"
+    ]}},
+    {type:"callout", tone:"tip", title:"Remember", text:"Policy says what should happen; mechanism makes it happen. A perfect policy with weak mechanisms is insecure, and strong mechanisms enforcing a vague policy create confusion."},
+​
+    {type:"h2", text:"6. The Goals of Security: Prevention, Detection, Recovery"},
+    {type:"list", ordered:true, title:"Three complementary goals", items:[
+      "Prevention: stop violations before they happen (e.g., access controls, encryption, firewalls). Prevention is ideal but never perfect.",
+      "Detection: recognize that a violation is occurring or has occurred (e.g., intrusion detection systems, audit logs, monitoring). Detection assumes prevention can fail.",
+      "Recovery: stop an ongoing attack, repair the damage, and resume correct operation (e.g., backups, incident response, forensic analysis). Recovery may also mean continuing to function while under attack."
+    ]},
+    {type:"p", text:"A strong security program uses all three: prevent what you can, detect what slips through, and recover quickly from whatever succeeds."},
+​
+    {type:"h2", text:"7. Assumptions and Trust"},
+    {type:"p", text:"Every policy, mechanism, and procedure rests on assumptions. If those assumptions are wrong, security breaks down even if everything else is implemented perfectly. Understanding your assumptions is the same as understanding your security."},
+    {type:"example", title:"The hidden assumptions in a security patch", text:"An administrator installs a vendor patch. Has security improved? Only if every hidden assumption holds: (1) the patch really came from the vendor and was not tampered with in transit; (2) the vendor tested it thoroughly \u2014 a rushed patch can open a new, easier hole; (3) the vendor's test environment matches the local one; and (4) the multi-step installation was performed perfectly. Break any one assumption and the patch becomes a problem instead of a fix."},
+    {type:"callout", tone:"warning", title:"Trust is always present", text:"Trust is usually implicit and unstated, but it never disappears. Even mathematical proof does not remove trust \u2014 it merely pushes it down to the theorem prover, the compiler, and the hardware."},
+​
+    {type:"h2", text:"8. Assurance, Operational Issues, and Human Factors"},
+    {type:"definition", term:"Assurance", text:"The confidence, backed by evidence, that a system meets its security requirements. It comes from careful specification, design, implementation, and testing."},
+    {type:"list", title:"Operational and managerial issues", items:[
+      "Cost-benefit analysis: is the protection worth more than the asset it protects?",
+      "Risk analysis: which assets matter most and which threats are realistic?",
+      "Laws and customs: controls must be legal and acceptable to the people who use them, or they will be bypassed."
+    ]},
+    {type:"list", title:"Human factors \u2014 often the weakest link", items:[
+      "Organizational problems: unclear responsibility, lack of resources, and no one accountable for security.",
+      "People problems: insiders (careless or malicious) and social engineering, where attackers trick people into breaking the rules."
+    ]},
+    {type:"callout", tone:"important", title:"The weakest link", text:"Technical defenses are often defeated not by breaking the cryptography, but by deceiving a human. Security awareness is therefore a core control, not an optional extra."},
+​
+    {type:"summary", title:"Chapter 1 \u2014 Key Takeaways", items:[
+      "Computer security protects systems and data through technical, organizational, and human layers \u2014 and it is a continuous process, not a product.",
+      "The CIA triad (Confidentiality, Integrity, Availability) is the foundation; each property is defined relative to a set of entities X and information I.",
+      "Threats fall into four classes: disclosure, deception, disruption, and usurpation. Specific attacks (snooping, spoofing, modification, DoS, repudiation) map onto these.",
+      "Risk combines threat, vulnerability, and impact; risk management reduces it cost-effectively.",
+      "Policy defines what is allowed; mechanism enforces it. Keep the two distinct.",
+      "Security pursues prevention, detection, and recovery together.",
+      "Every defense rests on assumptions and trust \u2014 and humans are frequently the weakest link."
+    ]}
+  ]
+});
+​
+window.CHAPTERS.push({
+  id: "ch2",
+  num: 2,
+  title: "Access Control",
+  subtitle: "How systems decide who may do what: the access matrix, DAC, MAC, ORCON, ACLs, capabilities, and RBAC.",
+  readMins: 22,
+  sections: [
+    {type:"intro", text:"Access control is the practical heart of security: it is the set of rules and mechanisms that decide which subjects (users, processes) may perform which operations (read, write, execute) on which objects (files, devices, records). This chapter starts from the abstract protection state and the access-control matrix, then walks through every model you need to know \u2014 discretionary, mandatory, and originator-controlled \u2014 and the two ways the matrix is implemented in real systems."},
+​
+    {type:"h2", text:"1. The Protection State and the Access-Control Matrix"},
+    {type:"definition", term:"Protection State", text:"The complete description, at a given moment, of all the rights every subject has over every object in a system. Security is about keeping the system in protection states that the policy considers authorized."},
+    {type:"definition", term:"Access-Control Matrix", text:"A model of the protection state as a table with one row per subject and one column per object (and per subject, since subjects can be objects too). Each cell lists the rights that subject holds over that object."},
+    {type:"table", title:"Example access-control matrix", headers:["Subject","file1","file2","process A"], rows:[
+      ["Alice","read, write, own","read","\u2014"],
+      ["Bob","read","read, write, own","\u2014"],
+      ["process A","read","\u2014","own"]
+    ]},
+    {type:"list", title:"Typical access rights", items:[
+      "read (r): view the contents of an object",
+      "write (w): modify the contents of an object",
+      "execute (x): run an object as a program",
+      "append (a): add to an object without reading existing contents",
+      "own (o): control the rights of others over the object (grant or revoke)"
+    ]},
+    {type:"p", text:"The matrix is usually huge and sparse (most cells are empty), so real systems never store it as a literal table. Instead they store it by columns (access control lists) or by rows (capabilities) \u2014 covered later in this chapter."},
+​
+    {type:"h2", text:"2. Subjects, Objects, and Rights"},
+    {type:"definition", term:"Subject", text:"An active entity that initiates actions \u2014 a user, a process acting on a user's behalf, or even a device."},
+    {type:"definition", term:"Object", text:"A passive entity that is acted upon \u2014 a file, a record, a memory segment, a printer. A subject can also be an object (e.g., one process controlling another)."},
+    {type:"definition", term:"Right (permission)", text:"An authorization for a subject to perform a specific operation on an object, recorded as an entry in the access-control matrix."},
+​
+    {type:"h2", text:"3. Discretionary Access Control (DAC / IBAC)"},
+    {type:"definition", term:"Discretionary Access Control (DAC)", text:"If an individual user can set an access-control mechanism to allow or deny access to an object, that mechanism is a Discretionary Access Control, also called Identity-Based Access Control (IBAC)."},
+    {type:"list", title:"Defining characteristics", items:[
+      "Identity is key: access depends on who is requesting (subject identity) and who owns the object.",
+      "Owner controls: the resource owner grants or revokes access at their own discretion; no one else can override that decision.",
+      "Most common model: UNIX file permissions and Windows NTFS ACLs are DAC."
+    ]},
+    {type:"example", title:"DAC in everyday life", text:"A child keeps a diary and grants read access only to her mother. No one else may read it. It is entirely her decision \u2014 her discretion. That is exactly how DAC works."},
+    {type:"example", title:"DAC on UNIX", text:"Running chmod 640 report.txt lets the owner read and write, the group read, and everyone else nothing. The owner alone chooses these permissions."},
+    {type:"callout", tone:"warning", title:"The weakness of DAC", text:"Because users control their own objects, a careless or tricked user (or malware running as that user) can hand out access freely. DAC cannot enforce an organization-wide rule that overrides the owner."},
+​
+    {type:"h2", text:"4. Mandatory Access Control (MAC)"},
+    {type:"definition", term:"Mandatory Access Control (MAC)", text:"When a system mechanism controls access to an object and an individual user cannot alter that access, the control is a Mandatory Access Control, sometimes called rule-based access control."},
+    {type:"p", text:"Access decisions are made by the system according to fixed rules and object attributes (such as classification labels: Unclassified, Confidential, Secret, Top Secret), not by the owner. Even the owner of a document cannot override the rule."},
+    {type:"example", title:"MAC in the real world", text:"The law allows a court to access driving records without the record owner's permission. The owner has no control \u2014 access is mandatory. Military classification systems work the same way: a Secret document is governed by system rules, not by whoever created it."},
+​
+    {type:"h2", text:"5. DAC vs. MAC"},
+    {type:"table", title:"Discretionary vs. Mandatory access control", headers:["Aspect","DAC (Discretionary)","MAC (Mandatory)"], rows:[
+      ["Who controls access?","Resource owner (user)","System / OS mechanism"],
+      ["Can owner override?","Yes \u2014 owner's discretion","No \u2014 rules are fixed"],
+      ["Based on?","Identity of subject/owner","Rules and object attributes (labels)"],
+      ["Can the user change it?","Yes, within their own objects","Never \u2014 system enforced"],
+      ["Common example","UNIX chmod, Windows ACLs","Military classification labels"]
+    ]},
+​
+    {type:"h2", text:"6. Originator-Controlled Access (ORCON / ORGCON)"},
+    {type:"definition", term:"Originator-Controlled Access (ORCON)", text:"An access control in which access decisions are based on the creator (originator) of an object or the information it contains. The originator controls dissemination even after handing the file to someone else."},
+    {type:"steps", title:"How ORCON differs from ownership", items:[
+      "Bit Twiddlers Inc. (the originator/creator) shares a specification with Microhackers Ltd.",
+      "Microhackers Ltd. now holds (owns) the file on its own systems.",
+      "But Microhackers cannot share the file further without Bit Twiddlers' explicit permission \u2014 the originator still controls access."
+    ]},
+    {type:"list", title:"Key points about ORCON", items:[
+      "Creator is not the owner: the holder possesses the file but cannot decide who else may access it.",
+      "Contrasted with DAC: in DAC the owner controls access; in ORCON the originator controls access regardless of who holds the file.",
+      "Real-world uses: government classified information shared with contractors, licensed intellectual property, trade secrets under NDA.",
+      "Implementation challenge: the file must carry its enforcement rules wherever it travels \u2014 Digital Rights Management (DRM) systems attempt exactly this and it is technically difficult."
+    ]},
+​
+    {type:"h2", text:"7. Implementing the Matrix: ACLs vs. Capabilities"},
+    {type:"p", text:"Since the full access-control matrix is impractical to store, systems slice it two ways."},
+    {type:"definition", term:"Access Control List (ACL)", text:"A column of the matrix stored with the object: for each object, the list of subjects and the rights each one has. Answers the question 'who can access this object?'."},
+    {type:"definition", term:"Capability (C-list)", text:"A row of the matrix stored with the subject: for each subject, the list of objects it may access and with what rights. A capability is like an unforgeable ticket. Answers the question 'what can this subject access?'."},
+    {type:"comparison", title:"ACLs vs. Capabilities", left:{title:"Access Control Lists", points:[
+      "Attached to the object",
+      "Easy to see who can access a given object",
+      "Easy to revoke all access to one object",
+      "Used by UNIX, Windows, most operating systems",
+      "Harder to audit one subject's total access"
+    ]}, right:{title:"Capabilities", points:[
+      "Attached to the subject (a ticket it carries)",
+      "Easy to see everything one subject can access",
+      "Easy to delegate by passing the ticket",
+      "Revocation is harder (tickets are spread out)",
+      "Must be unforgeable (protected by the system)"
+    ]}},
+​
+    {type:"h2", text:"8. Role-Based Access Control (RBAC)"},
+    {type:"definition", term:"Role-Based Access Control (RBAC)", text:"Access rights are assigned to roles (such as Manager, Clerk, Auditor) rather than directly to individuals. Users acquire rights by being assigned to roles. Changing a person's access is as simple as changing their role."},
+    {type:"p", text:"RBAC scales well in organizations: when an employee changes jobs you reassign their role instead of editing dozens of individual permissions. It also makes least privilege and separation of duties easy to express."},
+​
+    {type:"h2", text:"9. Least Privilege and Separation of Duties"},
+    {type:"callout", tone:"important", title:"Principle of Least Privilege", text:"Every subject should be granted only the minimum rights necessary to perform its task, and no more. This limits the damage if the subject is compromised or makes a mistake."},
+    {type:"callout", tone:"tip", title:"Separation of Duties", text:"No single person should be able to complete a sensitive transaction alone. Splitting a task among multiple people (e.g., one requests a payment, another approves it) prevents fraud and unauthorized modification."},
+​
+    {type:"h2", text:"10. Complete Comparison of the Three Models"},
+    {type:"table", title:"DAC vs. MAC vs. ORCON", headers:["Property","DAC","MAC","ORCON"], rows:[
+      ["Who controls?","Resource owner","System mechanism","Original creator"],
+      ["User override?","Yes (their objects)","Never","Only the originator"],
+      ["Key factor","Subject/object identity","Labels and rules","Creator identity"],
+      ["OS enforces?","Partially","Fully","Requires special support"],
+      ["Typical use","General computing","Military / high-security","IP and classified info sharing"]
+    ]},
+    {type:"callout", tone:"note", title:"Models can be combined", text:"Real systems often layer the models \u2014 for example DAC for everyday files with a MAC layer for classified data, or an ORCON overlay on top of DAC/MAC for shared intellectual property."},
+​
+    {type:"summary", title:"Chapter 2 \u2014 Key Takeaways", items:[
+      "The protection state is captured by the access-control matrix: subjects (rows) x objects (columns), with rights in each cell.",
+      "DAC lets the owner decide access (identity-based); it is the most common model but vulnerable to careless owners.",
+      "MAC lets the system enforce fixed rules and labels; users cannot override it (military classification).",
+      "ORCON lets the original creator control dissemination even after the file is handed over (DRM-style).",
+      "The matrix is implemented as ACLs (by object) or capabilities (by subject), each with different revocation and audit trade-offs.",
+      "RBAC assigns rights to roles for scalability; least privilege and separation of duties limit damage and fraud."
+    ]}
+  ]
+});
+​
+window.CHAPTERS.push({
+  id: "ch3",
+  num: 3,
+  title: "Security Policies",
+  subtitle: "Defining security for systems and organizations: policy types, models, trust, and real case studies.",
+  readMins: 26,
+  sections: [
+    {type:"intro", text:"A security policy is the document that defines, for one specific organization, exactly what secure means. This chapter formalizes that idea, shows how policies are classified (military vs. commercial, confidentiality vs. integrity), explains the role of abstract security models, examines the trust that every policy quietly depends on, and finishes with two real University of California case studies plus practical advice for writing policies. It maps directly to Chapter 4 of Bishop."},
+​
+    {type:"h2", text:"1. Fundamentals: What Is a Security Policy?"},
+    {type:"definition", term:"Security Policy (Def. 4-1)", text:"A statement that partitions the states of a system into a set of authorized (secure) states and a set of unauthorized (nonsecure) states."},
+    {type:"p", text:"Think of the system as a finite-state machine. Some states are authorized (for example s1 and s2) and some are unauthorized (for example s3 and s4). The policy is simply the line drawn between the two groups."},
+    {type:"definition", term:"Secure System (Def. 4-2)", text:"A system that starts in an authorized state and cannot enter an unauthorized state."},
+    {type:"definition", term:"Breach of Security (Def. 4-3)", text:"Occurs when a system enters an unauthorized state \u2014 regardless of which mechanism failed or how."},
+    {type:"definition", term:"Security Mechanism (Def. 4-7)", text:"An entity or procedure that enforces some part of the security policy."},
+​
+    {type:"h2", text:"2. Policy vs. Mechanism"},
+    {type:"comparison", title:"The most critical distinction in security", left:{title:"Policy", points:[
+      "A statement of what is and is not allowed",
+      "Defines authorized vs. unauthorized states",
+      "May be formal or informal",
+      "Context-dependent: policies differ by site",
+      "Can be implicit (early UNIX) or explicit"
+    ]}, right:{title:"Mechanism", points:[
+      "The control that enforces the policy",
+      "File access permissions (chmod, ACLs)",
+      "Network firewalls and packet filters",
+      "Physical locks and procedural controls",
+      "Cryptographic protocols and authentication"
+    ]}},
+    {type:"example", title:"Policy vs. mechanism", text:"Policy: No student may copy another student's homework assignment. Mechanism: file permissions that prevent one student from reading another student's homework file."},
+​
+    {type:"h2", text:"3. The CIA Triad in a Policy Context"},
+    {type:"p", text:"Every security policy must address all three core properties \u2014 in the specific context of the organization."},
+    {type:"definition", term:"Confidentiality", text:"No member of set X can obtain information about I. Prevents unauthorized disclosure, covering both direct leakage and indirect information flow."},
+    {type:"definition", term:"Integrity", text:"All members of X trust I \u2014 including its storage and conveyance. Encompasses data integrity, origin integrity (authentication), and assurance that resources function correctly."},
+    {type:"definition", term:"Availability", text:"All members of X can access resource I. The meaning of access varies by context: an ER system needs sub-minute responses; a bookstore may tolerate an hour."},
+​
+    {type:"h2", text:"4. Confidentiality In Depth"},
+    {type:"definition", term:"Confidentiality (formal)", text:"Let X be a set of entities and I some information. I has the property of confidentiality with respect to X if no member of X can obtain information about I."},
+    {type:"list", title:"Four things a confidentiality policy must handle", items:[
+      "Information disclosure: prevent leakage to unauthorized entities. The set X is often implicit (everyone not authorized).",
+      "Information flow: even without transferring rights, information can flow illicitly through side channels \u2014 the policy must cover indirect channels too.",
+      "Temporal authorization: access changes over time (a contractor under an NDA loses access when it expires).",
+      "Scope: a confidentiality policy deals only with confidentiality; integrity needs a separate policy component."
+    ]},
+    {type:"callout", tone:"note", title:"Key insight", text:"Confidentiality says nothing about whether information is correct \u2014 only about who may access it."},
+​
+    {type:"h2", text:"5. Integrity In Depth"},
+    {type:"definition", term:"Integrity (formal)", text:"Let X be a set of entities and I information or a resource. I has integrity with respect to X if all members of X trust I."},
+    {type:"list", ordered:true, title:"Three components of integrity", items:[
+      "Data integrity: the content has not been altered during storage or conveyance.",
+      "Origin integrity (authentication): the source is genuine and has not been forged or misrepresented.",
+      "Assurance: resources function correctly according to their specification (extends to software and hardware)."
+    ]},
+    {type:"callout", tone:"note", title:"Why integrity is harder", text:"Assigning a level of confidence is subjective. A new release from a trusted vendor may still have unknown bugs \u2014 trust depends on subjective belief, not just labels."},
+​
+    {type:"h2", text:"6. Availability In Depth"},
+    {type:"definition", term:"Availability (formal)", text:"Let X be a set of entities and I a resource. I has availability with respect to X if all members of X can access I."},
+    {type:"example", title:"Access depends on context", text:"A book-selling server taking up to 1 hour to process a purchase may still meet its availability requirement (low urgency, flexible latency). A medical server taking 1 hour to answer an allergy query in the ER does NOT \u2014 lives are at stake and seconds matter."},
+    {type:"callout", tone:"important", title:"State it explicitly", text:"Quality-of-service requirements and availability parameters must be written explicitly into the security policy."},
+​
+    {type:"h2", text:"7. Types of Security Policies"},
+    {type:"h3", text:"Military (Governmental) Security Policy \u2014 focus: Confidentiality"},
+    {type:"definition", term:"Military Security Policy (Def. 4-9)", text:"A security policy developed primarily to provide confidentiality."},
+    {type:"list", title:"Why confidentiality comes first", items:[
+      "Military operations depend on secrecy: leaking troop movements, ship sailing dates, or battle plans lets an adversary plan countermeasures.",
+      "Why not integrity first? Militaries have redundant communication channels, so altered data can often be caught \u2014 but leaked data can never be unleaked.",
+      "Privacy laws: civilian equivalents include the US Privacy Act (and similar Swedish legislation) constraining what governments may collect and how they use it.",
+      "Consequences of breach: fines, jail time, and loss of public trust \u2014 people stop sharing information with a compromised agency."
+    ]},
+    {type:"h3", text:"Commercial Security Policy \u2014 focus: Integrity"},
+    {type:"definition", term:"Commercial Security Policy (Def. 4-10)", text:"A security policy developed primarily to provide integrity."},
+    {type:"comparison", title:"Banking: why integrity matters most", left:{title:"Confidentiality breach", points:[
+      "An account balance is revealed",
+      "Embarrassing, possible loss of a customer",
+      "Minor financial impact"
+    ]}, right:{title:"Integrity breach", points:[
+      "Account balances are altered",
+      "Funds disappear or appear from nowhere",
+      "Financially ruinous"
+    ]}},
+    {type:"list", title:"Commercial integrity tools", items:[
+      "Transaction-oriented integrity policies: every action must leave the database in a consistent state \u2014 a transfer is either fully completed or fully rolled back, never halfway.",
+      "Separation of duties: external constraints can forbid one entity from completing a transaction alone, requiring multiple parties to prevent fraud."
+    ]},
+    {type:"table", title:"All four policy types at a glance", headers:["Policy type","Primary focus","Trust","Scope"], rows:[
+      ["Military","Confidentiality","No trust in objects","Also covers integrity and availability where possible"],
+      ["Commercial","Integrity","Trust level is subjective","May include transaction-oriented policies"],
+      ["Confidentiality policy","Confidentiality only","No trust in objects","Does NOT address integrity at all"],
+      ["Integrity policy","Integrity only","Trust level assigned by policy","Does NOT address confidentiality at all"]
+    ]},
+​
+    {type:"h2", text:"8. Security Models"},
+    {type:"definition", term:"Security Model (Def. 4-8)", text:"A model that represents a particular policy or set of policies. It abstracts the details relevant for analysis, focusing on characteristics shared by many policies."},
+    {type:"formula", title:"From policy to proof", lines:["Security Policy  \u2192  Security Model  \u2192  Formal Analysis","(site-specific rules) (abstract policy class) (mathematical proofs)"], caption:"A model lets you analyze an entire class of policies at once instead of every policy individually."},
+    {type:"list", title:"Why models matter", items:[
+      "Efficiency: many policies share the same structural properties, so one model analyzes a whole class at once.",
+      "Model vs. policy: a model abstracts away site-specific details \u2014 the same model can fit both a military policy and a corporate confidentiality policy.",
+      "The HRU result: no single nontrivial analysis can cover all policies (Theorem 3-2). Restricting the class of policies enough makes meaningful analysis possible.",
+      "Formal vs. informal: formal mathematical models enable rigorous proofs but are hard to read; informal policies are readable but ambiguous \u2014 precision requires formalism."
+    ]},
+​
+    {type:"h2", text:"9. The Role of Trust"},
+    {type:"list", ordered:true, title:"Five truths about trust", items:[
+      "Any theory or mechanism rests on certain assumptions.",
+      "If the assumptions are incorrect, security breaks down.",
+      "Understanding the assumptions equals understanding the security.",
+      "Even formal verification only pushes trust to a lower level \u2014 it never removes it.",
+      "Trust is implicit and often unstated, but it is always present."
+    ]},
+    {type:"example", title:"Trust in a security patch", text:"Installing a patch improves security only if four assumptions hold: (1) it really came from the vendor and was not tampered with; (2) the vendor tested it against all relevant attacks \u2014 a patch rushed out in 24 hours has been known to open a second, easier hole; (3) the vendor's test environment matches yours (a patch that resets ownership to root can break a system expecting ownership by bin); and (4) the multi-step installation was performed perfectly. Break any one and the patch becomes a problem."},
+    {type:"list", title:"Trust remains even in formal verification", items:[
+      "Theorem provers must themselves be correct \u2014 a bug in the prover invalidates the proof.",
+      "Preconditions fed to the prover must actually hold in the deployment environment (including the OS version).",
+      "The compiler and linker must produce executable code that behaves identically to the source \u2014 a rigged compiler can insert malicious code (the Thompson compiler attack).",
+      "The hardware must be correct \u2014 a verified program using floating point gave wrong results on the Pentium FDIV bug."
+    ]},
+    {type:"callout", tone:"warning", title:"Formal methods relocate trust", text:"Formal verification pushes trust lower \u2014 to theorem provers, compilers, and hardware \u2014 but never eliminates it entirely."},
+​
+    {type:"h2", text:"10. Types of Access Control"},
+    {type:"definition", term:"Discretionary Access Control (DAC / IBAC) (Def. 4-13)", text:"If a user can set an access-control mechanism to allow or deny access to an object, that mechanism is a DAC (also called Identity-Based Access Control). The owner decides; UNIX and Windows file permissions are examples."},
+    {type:"definition", term:"Mandatory Access Control (MAC) (Def. 4-14)", text:"When a system mechanism controls access and a user cannot alter it, the control is a MAC (rule-based). Example: a court accessing driving records without the owner's permission; military classification labels."},
+    {type:"definition", term:"Originator-Controlled Access (ORCON / ORGCON)", text:"Access is based on the creator of the object or its information. The originator controls dissemination even after giving the file away \u2014 the holder cannot reshare without the originator's permission. DRM systems attempt to enforce this."},
+    {type:"table", title:"Access control models compared", headers:["Property","DAC","MAC","ORCON"], rows:[
+      ["Who controls?","Resource owner","System mechanism","Original creator"],
+      ["User override?","Yes (their objects)","Never","Only the originator"],
+      ["Key factor","Subject/object identity","Labels and rules","Creator identity"],
+      ["OS enforces?","Partially","Fully","Requires special support"],
+      ["Typical use","General computing","Military / high-security","IP and classified info"]
+    ]},
+​
+    {type:"h2", text:"11. Case Study: UC Davis Acceptable Use Policy (AUP)"},
+    {type:"list", title:"An informal, community-focused policy", items:[
+      "Goals: provide access to campus resources and enable worldwide communication for research and education.",
+      "User responsibilities: respect other users' rights, respect system and physical-resource integrity, and obey all relevant laws and contracts.",
+      "Enforcement: minor violations resolved locally (warnings); serious ones lead to denial of access; very serious cases go to formal discipline via the Office of Student Judicial Affairs.",
+      "Prohibited actions: illicitly monitoring others, spamming, and locating or exploiting security vulnerabilities \u2014 listed as examples, not an exhaustive list.",
+      "Policy type: a typical AUP \u2014 written informally for the user community, assuming the reader understands the legal and organizational context."
+    ]},
+​
+    {type:"h2", text:"12. Case Study: UC Electronic Mail Policy (Three-Tier Structure)"},
+    {type:"comparison", title:"A more formal, system-wide policy", left:{title:"1. Policy Summary", points:[
+      "Email is not private \u2014 may be read accidentally or during maintenance",
+      "Think before sending; be courteous and respectful",
+      "Supervisors may read employees' work-related email",
+      "Personal email allowed but must not interfere with work"
+    ]}, right:{title:"2. Full Policy (all campuses)", points:[
+      "Email infrastructure is university property",
+      "Academic freedom and free-speech principles apply",
+      "Access without consent only under extreme circumstances",
+      "Such access must be approved by a Vice Chancellor or University Vice President",
+      "Anonymity permitted if it does not violate laws or policies"
+    ]}},
+    {type:"list", title:"3. Campus Implementation (Davis)", items:[
+      "Personal use not allowed if it benefits non-university organizations.",
+      "Specific procedures for email inspection and monitoring.",
+      "Appeal procedures established for disputed access.",
+      "The campus does not archive all email; backed-up email need not be provided to employees."
+    ]},
+    {type:"callout", tone:"important", title:"Hierarchy rule", text:"When there is a conflict, the higher (system-wide) policy always prevails over the campus implementation."},
+​
+    {type:"h2", text:"13. Policy Ambiguity: The Hidden Danger"},
+    {type:"list", title:"Where ambiguity comes from", items:[
+      "Implicit policies: early UNIX assumed a friendly research group ('don't delete others' files; unprotected files may be read'). That implied policy became inadequate in academic and commercial settings, but the mechanisms were never updated.",
+      "Mechanism-defined policies: when a policy is described by mechanisms instead of intent, and some mechanisms allow what others forbid, the effective policy is contradictory.",
+      "Natural-language ambiguity: the UC email policy's definition of E-mail includes 'transactional information associated with such records', which may or may not include network packets.",
+      "The fix: formal policy languages (such as DTEL, a constraint language) remove ambiguity with mathematical precision \u2014 but they require specialized knowledge to read and write."
+    ]},
+​
+    {type:"h2", text:"14. Building a Security Policy in Practice"},
+    {type:"steps", title:"How real organizations develop a policy", items:[
+      "Threat analysis: start from Chapter 1's framework \u2014 identify assets, adversaries, and plausible attacks.",
+      "Generic policy statement: begin with broad constraints covering everyone \u2014 goals, responsibilities, and prohibited actions at a high level.",
+      "Incident-driven refinement: as incidents and questions arise, refine the policy for specific cases. Real policies evolve and are never complete on day one.",
+      "Auxiliary policies: add subordinate policies (like the UC email policy) that add specifics but must never contradict the higher policy.",
+      "Campus/local implementation: each unit implements the policy in its own context, accounting for local variation and customs.",
+      "Enforcement mechanisms: define procedural, technical, and organizational controls, and assign responsibility for monitoring, response, and updates."
+    ]},
+​
+    {type:"summary", title:"Chapter 3 \u2014 Key Takeaways", items:[
+      "A security policy partitions system states into authorized and unauthorized; what is secure under one policy may be insecure under another.",
+      "CIA is non-negotiable: every policy must address confidentiality, integrity, and availability in context, and the meaning of access and trust varies by situation.",
+      "Military policies prioritize confidentiality; commercial policies prioritize integrity \u2014 each reflects different failure consequences.",
+      "Security models abstract policies so a whole class can be analyzed at once; the HRU result shows no single analysis fits all policies.",
+      "Trust underlies everything \u2014 even formal verification only relocates trust to provers, compilers, and hardware.",
+      "DAC (owner), MAC (system), and ORCON (creator) can be used alone or layered together.",
+      "Natural-language policies are inherently ambiguous; formal languages add rigor at the cost of expertise."
+    ]}
+  ]
+});
+​
+window.CHAPTERS.push({
+  id: "ch4",
+  num: 4,
+  title: "Basic Cryptography",
+  subtitle: "Classical and modern ciphers, cryptanalysis, DES, AES, public-key cryptography, RSA, and checksums.",
+  readMins: 30,
+  sections: [
+    {type:"intro", text:"Cryptography is the science of concealing meaning so that only authorized parties can read it. This chapter starts with the formal structure of a cryptosystem, breaks classical ciphers using statistics, builds up to the Data Encryption Standard and its successor AES, then crosses into the revolution of public-key cryptography and RSA, finishing with cryptographic checksums and HMAC. It maps to Chapter 8 of Bishop."},
+​
+    {type:"h2", text:"1. What Is Cryptography?"},
+    {type:"definition", term:"Cryptosystem (Def. 8-1)", text:"A cryptosystem is a 5-tuple (E, D, M, K, C), where M is the set of plaintexts, K the set of keys, C the set of ciphertexts, E: M x K -> C the set of enciphering functions, and D: C x K -> M the set of deciphering functions."},
+    {type:"list", title:"Core vocabulary", items:[
+      "Cryptography: the art and science of concealing meaning (Greek for 'secret writing').",
+      "Cryptanalysis: the breaking of codes and ciphers.",
+      "A cryptosystem formalizes exactly how messages are encrypted and decrypted.",
+      "Kerckhoffs's principle: assume the algorithm is publicly known; only the key is secret. Security must rest on the key, not on hiding the algorithm."
+    ]},
+​
+    {type:"h2", text:"2. The Caesar Cipher"},
+    {type:"p", text:"The Caesar cipher shifts each letter by a fixed key value. For key = 3: A->D, B->E, ..., Z->C. It is the simplest substitution cipher."},
+    {type:"formula", title:"Caesar cipher formulas", lines:["Encipherment:  Ek(m) = (m + k) mod 26","Decipherment:  Dk(c) = (26 + c \u2212 k) mod 26"], caption:"Letters are numbered A=0 ... Z=25."},
+    {type:"example", title:"Encrypting HELLO with key = 3", text:"H E L L O = 7 4 11 11 14. Add 3 (mod 26): 10 7 14 14 17 = K H O O R. So HELLO becomes KHOOR."},
+    {type:"callout", tone:"warning", title:"Trivially broken", text:"There are only 26 possible keys, so an attacker simply tries all of them (brute force) and reads which output looks like English."},
+​
+    {type:"h2", text:"3. Types of Cryptographic Attacks"},
+    {type:"list", ordered:true, title:"Three standard attack models", items:[
+      "Ciphertext-only attack: the adversary has ONLY the ciphertext; goal is to recover the plaintext (or the key).",
+      "Known-plaintext attack: the adversary has ciphertext AND its matching plaintext; goal is to find the key.",
+      "Chosen-plaintext attack: the adversary can request encipherment of plaintexts they choose; goal is to find the key."
+    ]},
+    {type:"callout", tone:"note", title:"What makes a cipher good", text:"A good cryptosystem must resist all three attack types. Attacks use both mathematics and statistics \u2014 statistical methods rely on a model of the language, such as English single-letter (1-gram) frequencies."},
+​
+    {type:"h2", text:"4. English Character Frequency Model (1-gram)"},
+    {type:"table", title:"Approximate English letter frequencies", headers:["Letter","Freq","Letter","Freq"], rows:[
+      ["E","0.130 (most frequent)","O","0.080"],
+      ["T","0.090","N","0.070"],
+      ["A","0.080","I","0.065"],
+      ["R","0.065","S","0.060"],
+      ["H","0.060","L","0.035"],
+      ["U","0.030","J","0.005"],
+      ["Z","0.002 (least frequent)","\u2014","used to crack ciphers"]
+    ]},
+    {type:"p", text:"Because E is by far the most common letter, the most frequent symbol in a long monoalphabetic ciphertext is very likely E \u2014 this is the lever that breaks simple substitution."},
+​
+    {type:"h2", text:"5. Classical Cryptosystems Overview"},
+    {type:"list", title:"Properties of classical (symmetric) ciphers", items:[
+      "Also called single-key or symmetric cryptosystems.",
+      "The same key is used for both encipherment and decipherment.",
+      "Formally, for every Ek in E and key k in K, there exists Dk in D such that Dk = Ek inverse.",
+      "Two fundamental types: transposition (rearranges characters) and substitution (replaces characters).",
+      "They can be combined to form product ciphers (DES is an example)."
+    ]},
+​
+    {type:"h2", text:"6. Transposition Ciphers"},
+    {type:"definition", term:"Transposition Cipher", text:"A cipher that rearranges the characters of the plaintext. The letters are not changed \u2014 only their positions are permuted."},
+    {type:"example", title:"Rail Fence cipher", text:"Write HELLO, WORLD in 2 rows then read across. Row 1: H L O O L. Row 2: E L W R D. Ciphertext: HLOOLELWRD."},
+    {type:"callout", tone:"tip", title:"How to detect and break it", text:"Single-letter (1-gram) frequencies still match English because the letters are unchanged, but bigram (2-gram) frequencies do NOT match. The attack is anagramming \u2014 rearranging letters guided by n-gram frequency tables."},
+​
+    {type:"h2", text:"7. Substitution Ciphers Overview"},
+    {type:"list", title:"Substitution replaces characters", items:[
+      "Unlike transposition, the characters are changed, not just rearranged.",
+      "Simple substitution: the Caesar cipher.",
+      "Polyalphabetic substitution: the Vigenere cipher.",
+      "Perfect-secrecy variant: the one-time pad.",
+      "The Caesar cipher is broken with a statistical ciphertext-only attack: compute the correlation phi(i) between the ciphertext and the English frequency model for each shift i."
+    ]},
+​
+    {type:"h2", text:"8. The Vigenere Cipher (Polyalphabetic)"},
+    {type:"list", title:"How it works", items:[
+      "Uses a sequence of keys (a keyword) instead of a single key.",
+      "Key letters are applied to successive plaintext characters, and the keyword repeats.",
+      "The period is the length of the keyword.",
+      "Because several alphabets are used in rotation, it is called a polyalphabetic cipher."
+    ]},
+    {type:"example", title:"Vigenere with key = BENCH", text:"Key:    B E N C H B E N C H ...  Plaintext: A L I M E R I C K P ...  Ciphertext: B P V O L S M P M W ... The keyword BENCH repeats across the message."},
+    {type:"callout", tone:"note", title:"Historically 'unbreakable'", text:"The Vigenere cipher was considered unbreakable for centuries \u2014 until Kasiski's method exposed the key length."},
+​
+    {type:"h2", text:"9. Breaking Vigenere: Kasiski's Method"},
+    {type:"p", text:"Observation: when the same key letters line up over the same plaintext letters, identical repeated strings appear in the ciphertext. The distance between two repetitions is a multiple of the period (key length)."},
+    {type:"steps", title:"Kasiski's method, step by step", items:[
+      "Find repeated strings (length >= 2) in the ciphertext.",
+      "Record the gaps (distances) between each pair of repetitions.",
+      "Compute the GCD of the gap lengths to estimate the probable key length.",
+      "Split the ciphertext into columns, one per key position (= probable key length).",
+      "Use the Index of Coincidence to verify the period.",
+      "Solve each column independently as a simple Caesar cipher."
+    ]},
+    {type:"definition", term:"Index of Coincidence (IC)", text:"The probability that two letters chosen at random from the ciphertext are the same. Its value reveals how many alphabets (the period) were used."},
+​
+    {type:"h2", text:"10. Index of Coincidence vs. Key Period"},
+    {type:"table", title:"Expected IC by period", headers:["Period","Expected IC","Interpretation"], rows:[
+      ["1","0.066","Caesar (one alphabet)"],
+      ["2","0.052","2-key Vigenere"],
+      ["3","0.047","3-key"],
+      ["4","0.045","4-key"],
+      ["5","0.044","5-key"],
+      ["10","0.041","10-key"],
+      ["Large","0.038","Approaches random"]
+    ]},
+​
+    {type:"h2", text:"11. The One-Time Pad \u2014 Perfect Secrecy"},
+    {type:"list", title:"Why it cannot be broken", items:[
+      "It is a Vigenere variant where the key is random and at least as long as the message.",
+      "The key is used only once and never repeated.",
+      "Shannon proved (1949) it is information-theoretically secure \u2014 provably impossible to break.",
+      "Every possible plaintext is equally likely given any ciphertext, so there is no statistical correlation to exploit."
+    ]},
+    {type:"list", title:"Practical drawbacks", items:[
+      "The key must be as long as the message \u2014 impractical for large data.",
+      "The key must be truly random.",
+      "Securely distributing such large keys is extremely difficult."
+    ]},
+​
+    {type:"h2", text:"12. The Data Encryption Standard (DES)"},
+    {type:"list", title:"Design overview", items:[
+      "Designed to encipher sensitive but non-classified data (NIST, 1977).",
+      "A bit-oriented product cipher: it combines transposition AND substitution.",
+      "Input, output, and key are each 64 bits; the effective key is 56 bits after parity bits are dropped.",
+      "16 rounds of encipherment, each using a different 48-bit round key derived from the main key (via PC-1, shifts, PC-2).",
+      "Decipherment uses the same algorithm with the round keys applied in reverse order.",
+      "Each round: the right half plus the round key go through function f, the result is XORed into the left half, and the halves are swapped."
+    ]},
+​
+    {type:"h2", text:"13. The DES f Function and S-Boxes"},
+    {type:"steps", title:"Inside the f function", items:[
+      "Expand the 32-bit right half to 48 bits.",
+      "XOR it with the 48-bit round key.",
+      "Split the result into eight 6-bit groups.",
+      "Feed each 6-bit group into its S-box, producing 4 bits out.",
+      "Concatenate the 8 x 4 = 32 bits and permute them to form the output of f."
+    ]},
+    {type:"list", title:"Why S-boxes matter", items:[
+      "S-boxes are the core non-linear element \u2014 they are what gives DES its strength.",
+      "After only 5 rounds, every output bit depends on every input bit and every key bit (the avalanche effect).",
+      "The S-box design criteria were originally classified, which raised suspicion of an NSA trapdoor.",
+      "Biham and Shamir (1990) later showed the S-boxes were actually designed to RESIST differential cryptanalysis."
+    ]},
+​
+    {type:"h2", text:"14. DES Weaknesses and Operating Modes"},
+    {type:"comparison", title:"Weaknesses and modes", left:{title:"Known weaknesses", points:[
+      "56-bit key is too short (warned by Diffie-Hellman, 1976)",
+      "4 weak keys (self-inverse) and 12 semi-weak key pairs",
+      "Complementation property: DESk(m)=c implies DES of the complement key on the complement message gives the complement ciphertext",
+      "By 1998 it could be broken in days with distributed computing",
+      "Replaced by AES (Rijndael, 2001)"
+    ]}, right:{title:"Operating modes", points:[
+      "ECB \u2014 Electronic Code Book (simple, rarely used)",
+      "CBC \u2014 Cipher Block Chaining (most common; self-healing)",
+      "CFB \u2014 Cipher Feedback (pseudo one-time pad)",
+      "OFB \u2014 Output Feedback (pseudo one-time pad)",
+      "EDE \u2014 Encrypt-Decrypt-Encrypt (2 keys)",
+      "Triple DES \u2014 3-key variant (strongest)"
+    ]}},
+​
+    {type:"h2", text:"15. Cipher Block Chaining (CBC) Mode"},
+    {type:"list", title:"How CBC works", items:[
+      "Each ciphertext block depends on the current plaintext block AND the previous ciphertext block.",
+      "It needs a 64-bit Initialization Vector (IV) in addition to the 64-bit key."
+    ]},
+    {type:"formula", title:"CBC equations", lines:["Encipher:  ci = DESk( mi XOR c(i-1) ),  with c0 = IV","Decipher:  mi = DESk inverse( ci ) XOR c(i-1)"], caption:"Chaining each block to the previous one hides patterns that ECB would leak."},
+    {type:"callout", tone:"tip", title:"Self-healing property", text:"If one ciphertext block is corrupted, the error propagates for at most two blocks; the system then heals and the following blocks decrypt correctly. CBC is the most widely used DES mode (banking, file encryption, TLS)."},
+​
+    {type:"h2", text:"16. From DES to AES"},
+    {type:"steps", title:"Timeline", items:[
+      "1977: DES published as a US federal standard.",
+      "1990: Biham and Shamir introduce differential cryptanalysis (about 2^47 chosen-plaintext pairs).",
+      "1993: Matsui introduces linear cryptanalysis (about 2^43 known-plaintext pairs).",
+      "1998: any DES message shown breakable in days with custom hardware.",
+      "1999: the EFF DES Cracker breaks DES in 22 hours."
+    ]},
+    {type:"list", title:"The Advanced Encryption Standard (AES)", items:[
+      "NIST selected the Rijndael algorithm in late 2001.",
+      "Like DES it is a product cipher (substitution + transposition).",
+      "Key sizes: 128, 192, or 256 bits. Block size: 128 bits.",
+      "Designed specifically to resist differential and linear cryptanalysis."
+    ]},
+​
+    {type:"h2", text:"17. Survey of Other Classical Ciphers"},
+    {type:"table", title:"Other block ciphers", headers:["Cipher","Block","Key","Status"], rows:[
+      ["NewDES","64 bits","120 bits","Broken (differential cryptanalysis)"],
+      ["FEAL-4","64 bits","64 bits","Broken with 20 chosen plaintexts"],
+      ["FEAL-8","64 bits","64 bits","Broken with 10,000 chosen plaintexts"],
+      ["REDOC-II","80 bits","160 bits","10 rounds \u2014 resists differential attacks"],
+      ["LOKI91","64 bits","64 bits","Resists differential cryptanalysis"],
+      ["Khufu","64 bits","512 bits","Resists with 24-32 rounds"],
+      ["IDEA","64 bits","128 bits","Used in PGP; appears secure"]
+    ]},
+​
+    {type:"h2", text:"18. Public-Key Cryptography"},
+    {type:"list", title:"The 1976 revolution", items:[
+      "Proposed by Diffie and Hellman (1976) \u2014 a radical break from classical cryptography.",
+      "Key insight: separate the encipherment key from the decipherment key.",
+      "Each user has two keys: a public key (widely published, used to send them a secret) and a private key (kept secret, used to decrypt).",
+      "Unlike classical crypto, no shared secret needs to exist before communication.",
+      "Encipher with the recipient's public key for confidentiality; encipher with the sender's private key for authentication (a digital signature)."
+    ]},
+​
+    {type:"h2", text:"19. RSA (Rivest, Shamir, Adleman)"},
+    {type:"formula", title:"RSA key generation and operations", lines:[
+      "Choose large primes p, q  ->  n = p q  ->  phi(n) = (p-1)(q-1)",
+      "Choose e with 1 < e < n and gcd(e, phi(n)) = 1",
+      "Find d such that e d = 1 (mod phi(n))",
+      "Public key = (e, n)    Private key = d",
+      "Encrypt:  c = m^e mod n        Decrypt:  m = c^d mod n"
+    ], caption:"Security rests on the difficulty of factoring n = p q (the integer factorization problem)."},
+    {type:"list", title:"RSA facts", items:[
+      "Practical key size: primes of at least 512 bits each, giving a modulus of at least 1024 bits.",
+      "RSA can provide confidentiality, data integrity, AND origin authentication."
+    ]},
+​
+    {type:"h2", text:"20. RSA \u2014 Numeric Example"},
+    {type:"example", title:"Encrypting and decrypting HE", text:"Let p = 7, q = 11, so n = 77 and phi(n) = 60. Alice chooses e = 17, giving d = 53; her public key is (17, 77). Bob encrypts HE = (7, 4): 7^17 mod 77 = 28 and 4^17 mod 77 = 16, so the ciphertext is 28 16. Alice decrypts with d = 53: 28^53 mod 77 = 7 (H) and 16^53 mod 77 = 4 (E)."},
+    {type:"callout", tone:"note", title:"Signing", text:"For authentication, Alice enciphers with her private key d = 53; anyone with her public key (17, 77) can verify it. Altering any ciphertext character makes decipherment fail \u2014 which is how tampering is detected."},
+​
+    {type:"h2", text:"21. RSA: Confidentiality vs. Authentication"},
+    {type:"comparison", title:"Two ways to use RSA", left:{title:"For confidentiality", points:[
+      "Sender uses the RECIPIENT's public key to encrypt",
+      "Only the recipient can decrypt (with their private key)",
+      "Anyone can send secrets to the recipient",
+      "Example: Bob encrypts with Alice's public key"
+    ]}, right:{title:"For authentication", points:[
+      "Sender uses their OWN private key to encrypt",
+      "Anyone can decrypt with the sender's public key",
+      "This proves the message came from the sender",
+      "Any alteration is detectable; Alice signs, Bob verifies"
+    ]}},
+​
+    {type:"h2", text:"22. Cryptographic Checksums and HMAC"},
+    {type:"definition", term:"Cryptographic Checksum (hash)", text:"A function that maps a message of arbitrary length to a fixed-length value (a digest) such that it is computationally infeasible to find two messages with the same digest, or to find a message matching a given digest. It protects integrity by detecting any change to the message."},
+    {type:"list", title:"Required properties", items:[
+      "One-way: given a digest, it is infeasible to find a message that produces it (preimage resistance).",
+      "Collision-resistant: it is infeasible to find two different messages with the same digest.",
+      "A small change in the message produces a large, unpredictable change in the digest (avalanche)."
+    ]},
+    {type:"definition", term:"HMAC (Keyed-Hash Message Authentication Code)", text:"A construction that combines a secret key with a cryptographic hash function to produce a message authentication code. It provides both data integrity and origin authentication: only someone who knows the key can produce or verify the correct HMAC."},
+​
+    {type:"summary", title:"Chapter 4 \u2014 Key Takeaways", items:[
+      "A cryptosystem is the 5-tuple (E, D, M, K, C); Kerckhoffs's principle says only the key should be secret.",
+      "Classical ciphers are symmetric (one shared key) and are either transposition (rearrange) or substitution (replace).",
+      "Statistical attacks use language frequency models; the Caesar cipher falls to brute force, and Vigenere falls to Kasiski's method plus the Index of Coincidence.",
+      "The one-time pad is provably unbreakable but impractical because of key length and distribution.",
+      "DES is a 16-round, 56-bit product cipher whose strength lies in its non-linear S-boxes; it is now obsolete and replaced by AES (128-bit blocks; 128/192/256-bit keys).",
+      "Public-key cryptography (Diffie-Hellman, 1976) separates public and private keys, removing the need for a shared secret.",
+      "RSA encrypts with c = m^e mod n and decrypts with m = c^d mod n; its security rests on the hardness of factoring. Public key encrypts for confidentiality; private key encrypts for authentication.",
+      "Cryptographic checksums and HMAC protect integrity and authenticity."
+    ]}
+  ]
+});
+​
+</script>
+​
+<script>
+/* MCQ bank. Options carry NO letter prefixes; the UI renders A./B./C./D. answer = 0-based index of correct option. */
+window.QUESTIONS = { ch1: [], ch2: [], ch3: [], ch4: [], final: [] };
+window.QUESTIONS.ch1 = [
+{q:"Which set of three properties forms the core foundation of information security?",options:["Confidentiality, Integrity, Availability","Authentication, Auditing, Access","Prevention, Detection, Correction","Encryption, Hashing, Signing"],answer:0,explanation:"The CIA triad \u2014 Confidentiality, Integrity, and Availability \u2014 is the cornerstone every security control ultimately supports."},
+{q:"A company discovers that customer records were viewed by an unauthorized outsider. Which property was primarily violated?",options:["Availability of the data","Confidentiality of the data","Integrity of the data","Redundancy of the data"],answer:1,explanation:"Unauthorized viewing is a disclosure problem, which is exactly what confidentiality protects against."},
+{q:"What does integrity, as a security property, mainly guarantee about data?",options:["It remains hidden from outsiders","It stays accurate and unaltered","It is always quickly reachable","It is stored in many copies"],answer:1,explanation:"Integrity ensures information is accurate, consistent, and has not been changed by anyone unauthorized."},
+{q:"A denial-of-service attack floods a server so users cannot reach it. Which property is targeted?",options:["Confidentiality of records","Integrity of records","Availability of service","Authenticity of users"],answer:2,explanation:"Denial-of-service overwhelms a system so legitimate users lose access, directly attacking availability."},
+{q:"Which statement best captures why security is described as holistic?",options:["It depends only on strong encryption tools","It combines technology, policy, and people","It relies solely on firewall hardware","It is achieved by one trusted product"],answer:1,explanation:"Security blends technical safeguards, organizational policy, and human awareness; the weakest of these limits overall strength."},
+{q:"In security terms, what is an asset?",options:["A flaw waiting to be exploited","Anything of value worth protecting","A person who attacks a system","A control that blocks intruders"],answer:1,explanation:"An asset is anything valuable to an organization \u2014 data, software, hardware, networks, or reputation \u2014 that needs protection."},
+{q:"What is the correct definition of a threat?",options:["A weakness in a configured system","A potential cause of harm to assets","The measured chance of any loss","A recovery step taken after damage"],answer:1,explanation:"A threat is a potential event or actor capable of causing harm \u2014 the 'what could go wrong'."},
+{q:"How is a vulnerability best described?",options:["An attacker seeking financial gain","A weakness a threat can exploit","The product of likelihood and impact","A policy that limits user actions"],answer:1,explanation:"A vulnerability is a weakness \u2014 like outdated software or a weak password \u2014 that a threat can take advantage of."},
+{q:"Risk in information security is most accurately understood as which combination?",options:["Threat added to a single asset","Likelihood combined with impact","Vulnerability minus any controls","Cost divided by total assets"],answer:1,explanation:"Risk arises when a threat exploits a vulnerability and is measured by how likely it is and how damaging it would be."},
+{q:"An organization patches outdated software across its network. Which part of the risk equation does this most directly reduce?",options:["The number of active threats","The exposure from vulnerabilities","The value of its core assets","The impact of every breach"],answer:1,explanation:"You usually cannot remove threats, but patching closes vulnerabilities, which lowers overall risk."},
+{q:"Which sequence correctly orders the risk-management process?",options:["Mitigate, monitor, identify, assess","Identify, assess, mitigate, monitor","Assess, identify, monitor, mitigate","Monitor, mitigate, assess, identify"],answer:1,explanation:"The cycle runs Identify \u2192 Assess \u2192 Mitigate \u2192 Monitor, then repeats continuously."},
+{q:"Why is risk management described as a continuous loop rather than a one-time task?",options:["Budgets are renewed every fiscal year","New threats and changes keep emerging","Employees rotate through departments","Hardware is replaced on a schedule"],answer:1,explanation:"Because the threat landscape constantly shifts, organizations must keep monitoring and reassessing to stay protected."},
+{q:"Which attacker type is primarily motivated by ideology or a political cause?",options:["Cybercriminals chasing profit","Hacktivists pursuing a cause","State actors seeking espionage","Insiders misusing their access"],answer:1,explanation:"Hacktivists are driven by ideology or political goals rather than money or state interests."},
+{q:"An employee accidentally emails a confidential file to the wrong recipient. This is an example of which threat category?",options:["A state-sponsored operation","An unintentional insider threat","An external hacktivist attack","A distributed denial of service"],answer:1,explanation:"Insider threats include accidental misuse of legitimate access, not only deliberate sabotage."},
+{q:"Which description best fits malware?",options:["Software designed to cause harm","A weakness in network design","A policy enforcing least privilege","A method of verifying identity"],answer:0,explanation:"Malware is malicious software \u2014 viruses, worms, trojans, spyware, ransomware \u2014 created to damage or exploit systems."},
+{q:"Phishing attacks succeed mainly by exploiting which weakness?",options:["Flaws in encryption algorithms","Human trust and behavior","Gaps in physical door locks","Errors in database indexing"],answer:1,explanation:"Phishing is social engineering: it manipulates human psychology rather than breaking technical defenses."},
+{q:"Which defense is generally the strongest countermeasure against phishing?",options:["Installing more server memory","Ongoing user awareness training","Increasing network bandwidth","Adding additional disk backups"],answer:1,explanation:"Since phishing targets people, educating and training users is the most effective defense."},
+{q:"A firewall that blocks malicious traffic before it enters is which kind of control?",options:["A corrective control","A preventive control","A detective control","A recovery control"],answer:1,explanation:"Preventive controls stop incidents before they happen; a firewall blocking traffic is a classic example."},
+{q:"An intrusion-detection system that alerts staff to an ongoing attack is best classified as which control?",options:["A preventive control","A detective control","A corrective control","A physical control"],answer:1,explanation:"Detective controls identify incidents as they occur or after the fact; IDS alerting is detective."},
+{q:"Restoring systems from backups after an incident is an example of which control function?",options:["Preventive function","Corrective function","Detective function","Deterrent function"],answer:1,explanation:"Corrective controls help recover and restore normal operation after an incident, such as restoring from backup."},
+{q:"Security awareness training for staff falls under which category of control?",options:["Technical control","Administrative control","Physical control","Cryptographic control"],answer:1,explanation:"Administrative controls are policies, procedures, and training that guide how people behave."},
+{q:"Door locks and security guards protecting a server room are which type of control?",options:["Technical controls","Physical controls","Administrative controls","Logical controls"],answer:1,explanation:"Physical controls protect facilities and hardware using tangible barriers like locks and guards."},
+{q:"What is the central idea behind defense in depth?",options:["Rely on one very strong barrier","Layer multiple overlapping controls","Encrypt only the most vital files","Trust users inside the network"],answer:1,explanation:"Defense in depth uses several layered controls so that if one fails, others still protect the system."},
+{q:"Which statement about the human factor in security is most accurate?",options:["Technology alone removes human risk","Most breaches involve human error","Training has no measurable effect","Insiders are never a real concern"],answer:1,explanation:"A large share of breaches trace back to human mistakes, so culture and training are essential."},
+{q:"What does authentication establish?",options:["What actions a user may perform","Who a user actually is","Which files were recently changed","How long a session may last"],answer:1,explanation:"Authentication verifies identity \u2014 proving who you are \u2014 before any access is granted."},
+{q:"What does authorization determine after a user is authenticated?",options:["Whether their identity is genuine","What they are permitted to do","How their password was stored","When their account was created"],answer:1,explanation:"Authorization decides what an already-authenticated user is allowed to access or perform."},
+{q:"Which scenario best illustrates the difference between authentication and authorization?",options:["Encrypting a file then deleting it","Logging in, then seeing only your account","Backing up data then restoring it","Scanning a network then patching it"],answer:1,explanation:"Logging in proves identity (authentication); being limited to your own account is authorization."},
+{q:"Multi-factor authentication improves security mainly by doing what?",options:["Requiring several proofs of identity","Encrypting all stored passwords","Replacing the need for any policy","Granting broad access to everyone"],answer:0,explanation:"MFA combines multiple independent factors, making unauthorized access far harder even if one factor leaks."},
+{q:"The principle of least privilege recommends that users receive what level of access?",options:["The maximum access available","Only the access they truly need","Access equal to their manager","Temporary access to everything"],answer:1,explanation:"Least privilege grants the minimum permissions necessary, limiting potential damage from misuse or compromise."},
+{q:"What does encryption fundamentally do to information?",options:["Removes it from storage entirely","Converts readable data to unreadable form","Copies it to multiple locations","Verifies who created the data"],answer:1,explanation:"Encryption transforms readable plaintext into unreadable ciphertext that requires a key to recover."},
+{q:"A zero-day exploit is dangerous specifically because it targets a flaw that has what status?",options:["A widely deployed patch","No available fix yet","A known, monitored signature","A low likelihood of use"],answer:1,explanation:"A zero-day attacks a vulnerability before any patch exists, leaving defenders with no ready fix."},
+{q:"In a man-in-the-middle attack, what does the attacker primarily do?",options:["Floods a server with requests","Intercepts communication between parties","Encrypts the victim's files for ransom","Guesses passwords through brute force"],answer:1,explanation:"A man-in-the-middle secretly intercepts (and may alter) communication flowing between two parties."},
+{q:"SQL injection is an attack that works by doing what?",options:["Overloading the network bandwidth","Inserting malicious database commands","Cracking encrypted password files","Impersonating a trusted website"],answer:1,explanation:"SQL injection inserts malicious commands into queries to manipulate or expose a database."},
+{q:"Why is classifying assets by sensitivity an important early step?",options:["It removes all system threats","It focuses protection where it matters","It eliminates the need for backups","It guarantees full availability"],answer:1,explanation:"Classification lets an organization prioritize spending on its most valuable and sensitive assets."},
+{q:"Which best describes ransomware?",options:["Software that quietly logs keystrokes","Malware that locks data for payment","A tool that verifies file integrity","A protocol for secure messaging"],answer:1,explanation:"Ransomware encrypts or locks a victim's data and demands payment to restore access."},
+{q:"What is the main goal of network segmentation?",options:["To speed up all data transfers","To limit how far an attacker can move","To remove the need for firewalls","To store data in fewer places"],answer:1,explanation:"Segmentation divides a network so a breach in one segment cannot easily spread across the whole environment."},
+{q:"A zero-trust architecture is built on which core assumption?",options:["Internal users are always safe","No user or device is trusted by default","Perimeter firewalls are sufficient","Encryption replaces all access checks"],answer:1,explanation:"Zero trust never assumes trust based on location; every request is verified regardless of origin."},
+{q:"Why must security work comply with data-protection laws and ethics?",options:["It speeds up network performance","It reduces legal liability and protects reputation","It removes the need for encryption","It guarantees zero future attacks"],answer:1,explanation:"Compliance with legal and ethical standards limits liability and safeguards an organization's reputation."},
+{q:"Which pairing of attacker and motivation is correct?",options:["Cybercriminal motivated by ideology","State actor motivated by espionage","Hacktivist motivated by pure profit","Insider motivated by national defense"],answer:1,explanation:"State-sponsored actors typically pursue espionage and strategic advantage on behalf of a nation."},
+{q:"Separation of duties helps reduce insider threats by doing what?",options:["Giving one person full control","Splitting critical tasks among people","Removing the need for logging","Allowing shared single accounts"],answer:1,explanation:"Separation of duties divides sensitive tasks so no single individual can abuse a process alone."},
+{q:"Behavior-based monitoring is increasingly used because advanced malware can do what?",options:["Run only on outdated hardware","Evade signature-based detection","Spread only through physical media","Encrypt nothing on the disk"],answer:1,explanation:"Sophisticated malware can dodge signature tools, so defenders watch for abnormal behavior instead."},
+{q:"Which example best represents a corrective control working with a detective control?",options:["A lock paired with a policy","An alarm detecting fire, then sprinklers acting","A password paired with encryption","A guard paired with a fence"],answer:1,explanation:"Detection (alarm) identifies the incident and the corrective measure (sprinklers) responds to limit damage."},
+{q:"Why can strengthening one part of the CIA triad sometimes weaken another?",options:["The properties are unrelated entirely","Trade-offs exist between the goals","Only confidentiality ever matters","Availability is never affected"],answer:1,explanation:"For example, heavy encryption can slow retrieval, trading some availability for confidentiality; balance is required."},
+{q:"What is the primary purpose of an incident-response plan?",options:["To prevent every possible attack","To guide reaction and recovery after incidents","To replace all technical controls","To classify assets by value"],answer:1,explanation:"Incident response defines how an organization detects, contains, and recovers from security incidents."},
+{q:"Which of the following is the best example of an availability-focused safeguard?",options:["Encrypting data at rest","Maintaining redundant backups and failover","Hashing stored passwords","Signing software releases"],answer:1,explanation:"Redundancy, backups, and failover keep systems usable, which directly supports availability."},
+{q:"A trojan is best described as malware that does what?",options:["Spreads by copying itself automatically","Disguises itself as legitimate software","Encrypts files for a ransom payment","Floods a target with network traffic"],answer:1,explanation:"A trojan masquerades as harmless or useful software to trick users into running it."},
+{q:"Why is identifying assets considered the first step in security planning?",options:["Threats disappear once listed","You cannot protect what you have not identified","It removes all system vulnerabilities","It makes encryption unnecessary"],answer:1,explanation:"Without knowing what assets exist, an organization cannot decide what to protect or how."},
+{q:"Which combination correctly reflects the relationship among the three core terms?",options:["Threat exploits vulnerability, creating risk","Risk exploits threat, creating vulnerability","Vulnerability exploits risk, creating threat","Threat removes vulnerability, ending risk"],answer:0,explanation:"A threat exploiting a vulnerability is precisely what produces risk."},
+{q:"Role-based access control supports security mainly by doing what?",options:["Giving permissions based on job roles","Removing the need to authenticate","Encrypting every stored password","Granting all users equal access"],answer:0,explanation:"RBAC assigns permissions according to a user's role, keeping access aligned with job needs."},
+{q:"Which statement about future security trends is most accurate?",options:["AI-driven detection and automation are growing","Human training is becoming irrelevant","Perimeter-only defense is the future standard","Encryption is being phased out entirely"],answer:0,explanation:"Defenses increasingly rely on automation, AI-driven detection, and zero-trust models to keep pace with threats."}
+];
+​
+window.QUESTIONS.ch2 = [
+{q:"In access-control terms, what is a subject?",options:["A passive resource being protected","An active entity that performs operations","A permission attached to a file","A rule limiting state transitions"],answer:1,explanation:"A subject is an active entity \u2014 a user, process, or service \u2014 that initiates operations in the system."},
+{q:"Which of the following is the best example of an object?",options:["A user running a program","A background system service","A stored database file","A process requesting access"],answer:2,explanation:"Objects are passive resources that are acted upon, such as files, memory, or printers."},
+{q:"What fundamentally distinguishes a subject from an object?",options:["Subjects are larger than objects","Subjects act while objects are acted upon","Objects always belong to subjects","Objects can never be deleted"],answer:1,explanation:"Subjects are active initiators of operations; objects are passive targets that only respond."},
+{q:"In the access-control model, what does a right represent?",options:["A specific operation a subject may perform","A weakness that can be exploited","A user's physical office location","The size of a stored file"],answer:0,explanation:"A right (access right) defines a specific permitted operation a subject may perform on an object."},
+{q:"Which classic right allows viewing content without changing it?",options:["Write access","Read access","Execute access","Control access"],answer:1,explanation:"Read lets a subject view an object's content; data is retrieved but not modified."},
+{q:"Improper granting of which right poses the most direct threat to integrity?",options:["Read access","Write access","Execute access","Browse access"],answer:1,explanation:"Write access allows modification, so granting it improperly threatens the integrity of data."},
+{q:"The control (own) right is especially sensitive because it allows a subject to do what?",options:["Run any installed program","Grant or revoke others' rights","View hidden system files","Increase available storage"],answer:1,explanation:"The control right lets a subject manage permissions \u2014 granting or revoking rights \u2014 which can lead to privilege escalation."},
+{q:"What does an access-control matrix represent?",options:["Network traffic between hosts","All subject-object permissions in a table","The encryption keys in a system","A list of detected vulnerabilities"],answer:1,explanation:"The matrix tabulates all permissions, with subjects as rows, objects as columns, and rights in the cells."},
+{q:"In an access-control matrix, what do the rows and columns represent respectively?",options:["Objects and subjects","Subjects and objects","Rights and conditions","Files and folders"],answer:1,explanation:"By convention, rows represent subjects and columns represent objects in the access-control matrix."},
+{q:"A single cell of the access-control matrix contains what information?",options:["The rights a subject holds over an object","The total number of system users","The encryption strength of a file","The history of all logins"],answer:0,explanation:"Each cell lists the set of rights that the row's subject has over the column's object."},
+{q:"Why is the access-control matrix described as sparse in real systems?",options:["It stores duplicate permissions everywhere","Most cells are empty of any rights","It contains only encrypted entries","It changes its size every second"],answer:1,explanation:"Most subjects have no rights to most objects, so the vast majority of cells are empty."},
+{q:"What practical problem arises from storing the full access-control matrix directly?",options:["It is too small to be useful","It wastes enormous storage on empty cells","It cannot represent any rights","It encrypts data automatically"],answer:1,explanation:"Because the matrix is mostly empty, storing it in full wastes huge amounts of space, so optimized structures are used."},
+{q:"An access control list (ACL) organizes permissions from whose perspective?",options:["The subject's perspective","The object's perspective","The administrator's perspective","The network's perspective"],answer:1,explanation:"An ACL is stored per object, listing which subjects may access it \u2014 it corresponds to a column of the matrix."},
+{q:"An ACL corresponds to which part of the access-control matrix?",options:["A single row","A single column","A diagonal entry","The entire matrix"],answer:1,explanation:"Because an ACL is organized per object, it represents one column of the access-control matrix."},
+{q:"A capability list organizes permissions from whose perspective?",options:["The object's perspective","The subject's perspective","The auditor's perspective","The vendor's perspective"],answer:1,explanation:"A capability list is stored per subject, describing which objects that subject may access \u2014 it is a row of the matrix."},
+{q:"A capability list corresponds to which part of the access-control matrix?",options:["A single column","A single row","A merged cell","The matrix header"],answer:1,explanation:"Because a capability list is organized per subject, it represents one row of the matrix."},
+{q:"Which question is easiest to answer using an ACL?",options:["What can this user access overall?","Who can access this particular object?","How many rights exist in total?","When was a right last revoked?"],answer:1,explanation:"Since an ACL lists subjects per object, it readily answers 'who can access this object?'"},
+{q:"Which question is easiest to answer using a capability list?",options:["Who can access this single file?","What objects can this subject access?","How large is the object?","Which cells are empty?"],answer:1,explanation:"A capability list groups by subject, so it readily answers 'what can this subject access?'"},
+{q:"Revoking access to one specific object for everyone is generally easier with which structure?",options:["Capability lists","Access control lists","A sparse diagonal","A random matrix"],answer:1,explanation:"Because an ACL gathers all subjects for one object in one place, removing access there is straightforward."},
+{q:"A capability is best described as which of the following?",options:["An entry in an object's permission list","An unforgeable token granting authority","A weakness that an attacker exploits","A log of recent access attempts"],answer:1,explanation:"A capability is an unforgeable token held by a subject that proves its authority to access an object."},
+{q:"Why must a capability token be unforgeable?",options:["To make it easier to copy","To prevent subjects from faking authority","To reduce its storage size","To allow public sharing"],answer:1,explanation:"If tokens could be forged, any subject could fabricate authority it was never granted, breaking access control."},
+{q:"What is a system state in the access-control model?",options:["The speed of the network","The full configuration of subjects, objects, and rights","The number of failed logins","The encryption algorithm in use"],answer:1,explanation:"A system state captures the complete arrangement of subjects, objects, and the rights connecting them at one moment."},
+{q:"What is a state transition?",options:["An operation that changes the configuration","A permanently fixed configuration","A type of encryption key","A backup of stored files"],answer:0,explanation:"A state transition is an operation \u2014 like granting or revoking a right \u2014 that moves the system to a new state."},
+{q:"Which set of operations are the primitive commands that change protection state?",options:["Encrypt, decrypt, sign, verify","Grant, revoke, create, delete","Read, hash, store, send","Login, logout, pause, resume"],answer:1,explanation:"The primitive commands grant a right, revoke a right, create an entity, or delete an entity, transforming the matrix."},
+{q:"What does the 'grant' command do to the access-control matrix?",options:["Removes a right from a cell","Adds a right to a cell","Deletes a whole column","Encrypts a row"],answer:1,explanation:"Granting adds a right to the appropriate matrix cell, expanding a subject's permissions."},
+{q:"What does the 'create' command introduce into the system?",options:["A new right within a cell","A new subject or object","A new encryption key","A new network link"],answer:1,explanation:"The create command introduces a new subject or object, adding a row or column to the matrix."},
+{q:"What is delegation in access control?",options:["Encrypting a file before sharing","A subject granting a held right to another subject","Deleting a user from the system","Auditing the access logs"],answer:1,explanation:"Delegation occurs when one subject passes a permission it holds to another, adding a new matrix entry."},
+{q:"A key rule of delegation is that a subject can only delegate what?",options:["Any right it wishes to invent","A right it actually possesses","Rights belonging to other users","Rights that no one holds"],answer:1,explanation:"You cannot give away a permission you do not have; delegation is limited to rights the delegator already holds."},
+{q:"Why is uncontrolled delegation a security concern?",options:["It slows down the network","It lets rights propagate widely","It deletes important objects","It encrypts files permanently"],answer:1,explanation:"Delegation lets authority spread from subject to subject; if uncontrolled, permissions propagate and security drifts."},
+{q:"What does the safety problem ask about a system?",options:["Whether the network is fast enough","Whether a right can ever leak to a subject","Whether backups are recent","Whether passwords are strong"],answer:1,explanation:"The safety problem asks whether, starting from a configuration, a particular right could ever reach a subject that should not have it."},
+{q:"In the safety problem, what is an 'unsafe' state?",options:["A state with no active users","A configuration that violates the policy","A state with full backups","A state with maximum encryption"],answer:1,explanation:"An unsafe state is one in which a right has leaked \u2014 i.e., the configuration violates the intended policy."},
+{q:"What did the HRU result establish about the general safety problem?",options:["It is always easy to solve","It is undecidable in general","It requires no assumptions","It depends only on encryption"],answer:1,explanation:"Harrison-Ruzzo-Ullman showed that, for general systems, there is no algorithm that can always decide safety."},
+{q:"Because general safety is undecidable, system designers commonly do what?",options:["Ignore safety entirely","Restrict systems to analyzable models","Remove all access controls","Encrypt the access matrix"],answer:1,explanation:"Designers deliberately limit expressiveness so the resulting, simpler models can be analyzed for safety."},
+{q:"A conditional command is one that executes only when what is true?",options:["The network is idle","Certain preconditions hold","All users are logged out","The disk is full"],answer:1,explanation:"A conditional command runs only if its preconditions are met, such as 'A may grant read only if A owns the file'."},
+{q:"Conditional commands enforce policy but have what drawback?",options:["They make analysis harder","They delete user accounts","They disable encryption","They remove all rights"],answer:0,explanation:"While conditions help enforce policy, they add complexity that makes formal safety analysis more difficult."},
+{q:"Which property makes a process able to be both a subject and an object?",options:["Its file size","Whether it initiates or receives an operation","Its encryption level","Its creation date"],answer:1,explanation:"A process acts as a subject when it initiates an operation and as an object when an operation is performed on it."},
+{q:"Why is accountability tied to the concept of subjects?",options:["Subjects store all the data","Actions are traced back to responsible subjects","Subjects cannot be logged","Subjects never change state"],answer:1,explanation:"Because subjects initiate operations, logging their actions allows the system to attribute and audit behavior."},
+{q:"Which is the most accurate description of how ACLs are used in real operating systems?",options:["They are purely theoretical only","UNIX and NTFS permissions implement them","They store encryption keys","They replace all authentication"],answer:1,explanation:"Real systems like UNIX file permissions and Windows NTFS implement the ACL concept directly."},
+{q:"What is the relationship between the access-control matrix and ACLs or capability lists?",options:["They store unrelated data","ACLs and capabilities are efficient slices of the matrix","The matrix replaces both of them","They encrypt the matrix"],answer:1,explanation:"ACLs (columns) and capability lists (rows) are space-efficient ways to store the same information the matrix represents."},
+{q:"If a row 'Bob' and column 'File1' in the matrix is empty, what does it mean?",options:["Bob owns File1 completely","Bob has no rights over File1","File1 is encrypted for Bob","Bob can delete File1"],answer:1,explanation:"An empty cell means the subject holds no rights at all over that object."},
+{q:"Which statement about evaluating a system at one instant is correct?",options:["It examines a single system snapshot","It predicts all future attacks","It encrypts the configuration","It deletes unused rights"],answer:0,explanation:"A security evaluation inspects the configuration (snapshot) at one specific moment in time."},
+{q:"Why is reasoning about future states important even if the current state is secure?",options:["The current state never matters","A safe state today may become unsafe later","Future states are always identical","Encryption removes the need"],answer:1,explanation:"As rights change through transitions, a currently secure system could later reach an unsafe state, so future states matter."},
+{q:"Which of the following is a passive entity in the access-control model?",options:["A user typing commands","A printer receiving a job","A process requesting a file","A service initiating a transfer"],answer:1,explanation:"A printer is acted upon (it receives jobs), making it a passive object rather than an active subject."},
+{q:"What is the main advantage of slicing the matrix into ACLs or capability lists?",options:["It increases empty-cell storage","It stores the same information far more compactly","It removes the need for rights","It hides the subjects entirely"],answer:1,explanation:"Slicing avoids storing empty cells, keeping the same permission information while using far less space."},
+{q:"In a dynamic system, why does the protection state change frequently?",options:["Users, objects, and rights are constantly added or removed","The encryption key rotates each second","The matrix is read-only","Subjects never perform operations"],answer:0,explanation:"Real systems continually create users, add resources, and grant or revoke rights, producing frequent state changes."},
+{q:"Which best illustrates a state transition?",options:["Reading the current permission list","Granting Bob write access to a file","Counting the number of objects","Measuring network latency"],answer:1,explanation:"Granting a right changes the configuration, moving the system from one protection state to another."},
+{q:"A subject is sometimes called an 'access initiator' because it does what?",options:["Stores the requested data","Begins every access request","Encrypts the object","Logs other subjects' actions"],answer:1,explanation:"Every operation starts with a subject requesting access, so subjects are the initiators of access."},
+{q:"Which scenario shows privilege escalation through the control right?",options:["A user reads a public document","A user with control grants itself admin rights","A user logs out of the system","A user encrypts a personal file"],answer:1,explanation:"If a subject holding the control right grants itself broader rights, it escalates its privileges \u2014 a key risk."},
+{q:"Why are objects required to appear explicitly in the access-control model?",options:["Unmodeled objects cannot be protected","Objects must encrypt themselves","Objects initiate their own access","Objects replace subjects"],answer:0,explanation:"If a resource is not represented in the model, no rights govern it, so it cannot be protected."},
+{q:"Which pair correctly matches a structure to its matrix orientation?",options:["ACL = row, capability = column","ACL = column, capability = row","Both are full diagonals","Both are single cells"],answer:1,explanation:"An ACL is a column (per object) and a capability list is a row (per subject) of the access-control matrix."}
+];
+​
+window.QUESTIONS.ch3 = [
+{q:"What does a security policy fundamentally do to the states of a system?",options:["Encrypts every possible state","Partitions them into authorized and unauthorized","Counts the total number of states","Deletes all unused states"],answer:1,explanation:"A security policy divides system states into authorized (secure) and unauthorized (non-secure) sets."},
+{q:"According to its formal definition, a secure system is one that does what?",options:["Starts authorized and never enters an unauthorized state","Uses the strongest possible encryption","Has no users at all","Stores many backup copies"],answer:0,explanation:"A secure system begins in an authorized state and can never transition into an unauthorized one."},
+{q:"A breach of security is best defined as which event?",options:["A scheduled system backup","A system entering an unauthorized state","A user changing their password","A routine software update"],answer:1,explanation:"A breach is precisely the event of the system entering an unauthorized (non-secure) state."},
+{q:"Which statement correctly distinguishes policy from mechanism?",options:["Policy is the tool; mechanism is the goal","Policy is what is allowed; mechanism is how it is enforced","They are identical concepts","Mechanism defines authorized states"],answer:1,explanation:"Policy states WHAT is allowed; mechanism is the technique that enforces it (the HOW)."},
+{q:"A password check used to enforce a login rule is an example of which concept?",options:["A policy","A mechanism","A breach","A vulnerability"],answer:1,explanation:"The password check is a mechanism \u2014 the tool that enforces the policy about who may log in."},
+{q:"The rule 'only managers may approve payments' is best classified as which?",options:["A mechanism","A policy","A cryptosystem","An access token"],answer:1,explanation:"This statement defines what is allowed, making it a policy rather than an enforcement mechanism."},
+{q:"Why can a single policy be enforced by many different mechanisms?",options:["Policies and mechanisms are the same","The goal is independent of the specific tool used","Mechanisms cannot enforce policies","Each policy needs exactly one tool"],answer:1,explanation:"Because policy describes the goal, any mechanism capable of achieving that goal can enforce it."},
+{q:"In policy terms, confidentiality refers to which property?",options:["Keeping resources usable","Concealing information from unauthorized parties","Preventing unauthorized modification","Logging all user actions"],answer:1,explanation:"Confidentiality is the concealment of information or resources from those not authorized to see them."},
+{q:"In policy terms, integrity refers primarily to which property?",options:["The trustworthiness and correctness of data","The concealment of data","The speed of data access","The number of data copies"],answer:0,explanation:"Integrity is the trustworthiness of data \u2014 preventing improper or unauthorized modification."},
+{q:"A military (governmental) security policy is developed primarily to provide what?",options:["Integrity","Confidentiality","Availability","Redundancy"],answer:1,explanation:"Military policies focus mainly on confidentiality \u2014 preventing unauthorized disclosure of classified information."},
+{q:"A commercial security policy is developed primarily to provide what?",options:["Confidentiality","Integrity","Anonymity","Availability"],answer:1,explanation:"Commercial policies focus mainly on integrity \u2014 preventing unauthorized modification of information."},
+{q:"Which concern best characterizes a confidentiality-focused policy?",options:["Preventing unauthorized disclosure","Preventing unauthorized modification","Maximizing system uptime","Reducing storage costs"],answer:0,explanation:"A confidentiality policy is centrally concerned with stopping the disclosure of information."},
+{q:"Which concern best characterizes an integrity-focused policy?",options:["Preventing unauthorized disclosure","Preventing unauthorized modification","Improving network speed","Hiding all metadata"],answer:1,explanation:"An integrity policy is centrally concerned with preventing unauthorized changes to information."},
+{q:"A bank's main worry that account balances must never be improperly altered reflects which policy emphasis?",options:["Confidentiality","Integrity","Availability","Anonymity"],answer:1,explanation:"Keeping records accurate and unaltered is an integrity concern, typical of commercial policy."},
+{q:"A government's main worry that classified files must not be disclosed reflects which policy emphasis?",options:["Integrity","Confidentiality","Availability","Redundancy"],answer:1,explanation:"Preventing disclosure of secrets is a confidentiality concern, typical of military policy."},
+{q:"What is the role of a security model?",options:["To replace all mechanisms","To represent a policy abstractly for analysis","To encrypt the policy text","To delete unauthorized states"],answer:1,explanation:"A security model abstractly represents a policy so it can be reasoned about and verified."},
+{q:"The HRU result is relevant to security policy because it shows what?",options:["All policies are easy to verify","Determining whether a right can leak is undecidable in general","Encryption is always unbreakable","Policies never need mechanisms"],answer:1,explanation:"HRU showed the general safety question (can a right leak?) is undecidable, limiting what models can guarantee."},
+{q:"Why is trust considered an unavoidable foundation of security?",options:["Everything can be verified from scratch","At some point we must rely on unverified assumptions","Trust eliminates all vulnerabilities","Trust replaces the need for policy"],answer:1,explanation:"You cannot verify every component independently, so security ultimately rests on some trusted assumptions."},
+{q:"When an administrator installs a vendor's security patch, which is a trust assumption being made?",options:["The patch correctly fixes the flaw","The network is offline forever","The users will never log in","The disk is fully encrypted"],answer:0,explanation:"Installing a patch assumes the vendor wrote it correctly and that it actually fixes the flaw without adding new ones."},
+{q:"What is the recommended way to handle trust assumptions in good security design?",options:["Hide them from everyone","Make them explicit and review them","Assume they never fail","Eliminate them completely"],answer:1,explanation:"Good design makes trust assumptions explicit so they can be examined, rather than leaving them hidden."},
+{q:"In discretionary access control (DAC), who decides access to a resource?",options:["The system administrator only","The owner of the resource","The originator of the data","A central labeling authority"],answer:1,explanation:"Under DAC, the resource owner decides who may access it, at their discretion."},
+{q:"DAC is also referred to by which alternative name?",options:["Mandatory access control","Identity-based access control","Originator-controlled access","Role-based access control"],answer:1,explanation:"DAC is identity-based (IBAC) because access decisions are based on the identity of subjects."},
+{q:"In mandatory access control (MAC), who enforces access decisions?",options:["The individual resource owner","The system or organization through rules","The data's originator","Each end user freely"],answer:1,explanation:"Under MAC, the system enforces access using organization-defined rules; individual owners cannot override them."},
+{q:"A key feature of MAC compared to DAC is that under MAC a user cannot do what?",options:["Authenticate to the system","Override the system's access rules","Read any authorized file","Log out normally"],answer:1,explanation:"In MAC, even owners cannot grant access the system's mandatory rules forbid, unlike DAC."},
+{q:"In originator-controlled access control (ORCON), who controls how information may be redistributed?",options:["The current holder of the data","The originator who created it","The system administrator","Any authorized reader"],answer:1,explanation:"Under ORCON, the originator (creator) dictates redistribution, even after the data has been shared."},
+{q:"Which scenario best illustrates ORCON?",options:["A file owner freely sharing as they wish","A recipient unable to forward a document without the creator's permission","The system labeling files by clearance","A user choosing their own password"],answer:1,explanation:"ORCON keeps control with the originator, so even a legitimate recipient cannot redistribute without permission."},
+{q:"Which access-control type is most associated with military classification levels?",options:["DAC","MAC","ORCON","IBAC"],answer:1,explanation:"MAC uses system-enforced labels/clearances, making it characteristic of military classification environments."},
+{q:"Which access-control type is typical of ordinary file systems where owners set permissions?",options:["MAC","DAC","ORCON","Label-based control"],answer:1,explanation:"Ordinary file systems are discretionary: the file owner sets the permissions, which is DAC."},
+{q:"Why is policy ambiguity considered dangerous?",options:["It speeds up enforcement","It lets people interpret rules differently, creating gaps","It removes the need for mechanisms","It guarantees full security"],answer:1,explanation:"Ambiguous policies invite differing interpretations, leaving gaps that attackers can exploit."},
+{q:"The phrase 'reasonable personal use' in an email policy is an example of what problem?",options:["Strong encryption","Policy ambiguity","Perfect availability","Mandatory control"],answer:1,explanation:"Such vague wording is ambiguous, making the policy hard to interpret and enforce consistently."},
+{q:"Which is a good first step when building a workable security policy?",options:["Pick mechanisms before any goals","State the goals and which CIA properties matter","Encrypt the whole network first","Delete all existing accounts"],answer:1,explanation:"Effective policy starts by stating goals \u2014 deciding which of confidentiality, integrity, and availability matter for which assets."},
+{q:"How do availability concerns enter a security policy?",options:["By ensuring authorized access is not blocked","By hiding all information","By preventing every modification","By removing all user rights"],answer:0,explanation:"Availability ensures authorized users can access resources when needed, including resistance to denial-of-service."},
+{q:"Which statement about real-world organizational policies is most accurate?",options:["They use only confidentiality, never integrity","They usually combine confidentiality and integrity","They never need availability","They avoid all trust assumptions"],answer:1,explanation:"Although pure definitions separate them, real organizations typically blend confidentiality and integrity goals."},
+{q:"A 'confidentiality policy' in the strict sense deals with which property only?",options:["Integrity only","Confidentiality only","Availability only","All three equally"],answer:1,explanation:"In the strict textbook sense, a confidentiality policy concerns only confidentiality."},
+{q:"An 'integrity policy' in the strict sense deals with which property only?",options:["Confidentiality only","Integrity only","Availability only","Anonymity only"],answer:1,explanation:"In the strict sense, an integrity policy concerns only integrity \u2014 preventing unauthorized modification."},
+{q:"Why must we reason about state transitions, not just the current state, in policy?",options:["States never change","Transitions can move the system toward unauthorized states","Transitions are always secure","Only the first state matters"],answer:1,explanation:"Because operations change configuration, a secure system must avoid transitions that lead into unauthorized states."},
+{q:"Origin integrity, a component of integrity, refers to what?",options:["Hiding the data's content","Authenticating the source of data","Maximizing data availability","Counting data copies"],answer:1,explanation:"Origin integrity concerns the authentication of the data's source, complementing data (content) integrity."},
+{q:"Which best explains why mechanisms alone cannot guarantee security?",options:["Mechanisms are always perfect","Without a policy, there is no definition of what 'secure' means","Policies are unnecessary","Mechanisms define authorized states themselves"],answer:1,explanation:"A mechanism enforces something, but only a policy defines what secure means; without policy, enforcement has no goal."},
+{q:"A layered university email policy that combines general principles, specific rules, and procedures illustrates what?",options:["That policies are always ambiguous","That real policies are built in structured tiers","That mechanisms replace policies","That confidentiality is irrelevant"],answer:1,explanation:"Real policies (like UC's email policy) are often structured into tiers of principles, rules, and procedures."},
+{q:"Which is the correct relationship between authorized states and a secure system?",options:["A secure system stays within authorized states","A secure system must visit unauthorized states","Authorized states are always empty","Authorized states require no policy"],answer:0,explanation:"A secure system remains within the authorized set of states for its entire operation."},
+{q:"In the DAC model, a notable risk is that owners can do what?",options:["Be forced by the system to share","Pass rights to others at their discretion, leaking access","Never grant any access","Override mandatory labels"],answer:1,explanation:"Because DAC lets owners grant rights freely, they can inadvertently or deliberately leak access \u2014 a known weakness."},
+{q:"Which property of MAC makes it strong against insider leaks?",options:["Owners can override rules","The system enforces rules users cannot bypass","There are no labels","Users set their own clearances"],answer:1,explanation:"Because MAC rules are enforced by the system and cannot be overridden by users, insiders cannot freely leak access."},
+{q:"ORCON is considered difficult to enforce technically because it requires what?",options:["No control after sharing","Persistent control over redistribution by the originator","Deleting data immediately","Encrypting only metadata"],answer:1,explanation:"ORCON demands the originator retain control over redistribution even after sharing, which is hard to enforce in practice."},
+{q:"Which is the best summary of the policy/mechanism relationship?",options:["One policy maps to exactly one mechanism","Many mechanisms can serve one policy and vice versa","Mechanisms define policies","Policies enforce mechanisms"],answer:1,explanation:"A policy can be enforced by many mechanisms, and a mechanism can support many policies; they are distinct layers."},
+{q:"Why is stating authorized vs unauthorized states clearly important when writing policy?",options:["It makes the policy ambiguous","It removes ambiguity and supports enforcement","It eliminates the need for trust","It encrypts the policy"],answer:1,explanation:"Clear definitions of allowed and forbidden states reduce ambiguity and make the policy enforceable."},
+{q:"Which example reflects an availability requirement within a policy?",options:["Hiding salaries from staff","Ensuring the payroll system is reachable on payday","Preventing edits to records","Signing each transaction"],answer:1,explanation:"Guaranteeing that an authorized system is reachable when needed is an availability requirement."},
+{q:"A security model that deliberately limits expressiveness does so to achieve what?",options:["Faster networking","Analyzable safety properties","Larger storage","More ambiguity"],answer:1,explanation:"Because general safety is undecidable, restricted models trade expressiveness for the ability to analyze safety."},
+{q:"Which pairing of access-control type and decision-maker is correct?",options:["MAC \u2192 resource owner","DAC \u2192 resource owner","ORCON \u2192 system only","DAC \u2192 originator only"],answer:1,explanation:"DAC places the access decision with the resource owner, which is the defining feature of discretionary control."},
+{q:"Which statement about confidentiality and integrity trade-offs in policy is most accurate?",options:["They are always identical goals","A policy may emphasize one over the other depending on context","Integrity always overrides confidentiality","Neither can appear in one policy"],answer:1,explanation:"Different contexts (military vs commercial) emphasize confidentiality or integrity differently; policy reflects priorities."},
+{q:"The overall purpose of a security policy can best be summarized as what?",options:["To list all system bugs","To define what secure means and separate allowed from forbidden states","To replace all mechanisms","To encrypt every file"],answer:1,explanation:"A security policy defines what 'secure' means for a system by partitioning states into authorized and unauthorized."}
+];
+​
+window.QUESTIONS.ch4 = [
+{q:"A cryptosystem is formally defined as a tuple containing which components?",options:["Users, roles, files, and keys","Encryption, decryption, plaintexts, keys, and ciphertexts","Threats, assets, risks, and controls","Subjects, objects, rights, and states"],answer:1,explanation:"A cryptosystem is the 5-tuple (E, D, M, K, C): encryption and decryption functions, messages, keys, and ciphertexts."},
+{q:"What does Kerckhoffs's principle state about a cryptosystem's security?",options:["The algorithm must always be secret","Security should rest only on the secrecy of the key","Keys should be shared publicly","Encryption is unnecessary if hidden"],answer:1,explanation:"Kerckhoffs's principle says a system should stay secure even if everything but the key is public; security rests on the key."},
+{q:"Why is 'security through obscurity' considered unreliable?",options:["Algorithms can leak or be reverse-engineered","Keys are impossible to generate","Obscurity makes keys longer","It always uses the one-time pad"],answer:0,explanation:"Hidden algorithms eventually leak or are reverse-engineered, so relying on their secrecy is unreliable."},
+{q:"The Caesar cipher encrypts a letter using which operation?",options:["E_k(m) = (m \u00D7 k) mod 26","E_k(m) = (m + k) mod 26","E_k(m) = (m \u2212 26) mod k","E_k(m) = (k \u2212 m) mod 2"],answer:1,explanation:"The Caesar cipher shifts each letter by a fixed k: E_k(m) = (m + k) mod 26."},
+{q:"Encrypting the letter 'A' (value 0) with a Caesar shift of 3 yields which letter?",options:["Letter X","Letter D","Letter C","Letter Z"],answer:1,explanation:"(0 + 3) mod 26 = 3, which corresponds to 'D'."},
+{q:"Why is the Caesar cipher easily broken by brute force?",options:["It uses a very long random key","There are only 25 possible non-zero shifts","It uses public-key mathematics","It changes the key each letter"],answer:1,explanation:"With only 25 possible shifts, an attacker can simply try them all in seconds."},
+{q:"In a ciphertext-only attack, what does the attacker have access to?",options:["Chosen plaintext-ciphertext pairs","Only ciphertext","The secret key directly","The full algorithm source code only"],answer:1,explanation:"In a ciphertext-only attack, the adversary sees only ciphertext and must deduce everything else."},
+{q:"Which attack model is the most powerful for the attacker?",options:["Ciphertext-only","Chosen-plaintext","Brute-force only","No-knowledge"],answer:1,explanation:"In a chosen-plaintext attack the adversary can pick plaintexts and see their ciphertexts, the strongest of the listed models."},
+{q:"A frequency analysis attack exploits which fact about a language?",options:["All letters appear equally often","Some letters appear far more often than others","Letters never repeat","Letters have no statistical pattern"],answer:1,explanation:"Languages have characteristic letter frequencies (e.g., 'e' is common in English), which break simple substitution ciphers."},
+{q:"What distinguishes a transposition cipher from a substitution cipher?",options:["It replaces each symbol with another","It rearranges symbol positions without changing them","It uses public and private keys","It always uses a 56-bit key"],answer:1,explanation:"A transposition cipher reorders the symbols; the symbols themselves are unchanged, unlike substitution."},
+{q:"The rail-fence cipher is an example of which cipher family?",options:["Substitution","Transposition","Public-key","Hashing"],answer:1,explanation:"The rail-fence rearranges letter positions in a zig-zag, making it a transposition cipher."},
+{q:"The Vigen\u00E8re cipher is classified as which type of cipher?",options:["Monoalphabetic substitution","Polyalphabetic substitution","Pure transposition","Asymmetric cipher"],answer:1,explanation:"Vigen\u00E8re uses a repeating keyword to apply multiple Caesar shifts, making it polyalphabetic."},
+{q:"In the Vigen\u00E8re cipher, what is the 'period'?",options:["The length of the repeating keyword","The number of ciphertext blocks","The size of the alphabet","The time to encrypt one letter"],answer:0,explanation:"The period is the length of the repeating keyword, which determines how the cipher cycles through shifts."},
+{q:"Why does the Vigen\u00E8re cipher resist simple frequency analysis?",options:["It deletes common letters","It flattens letter frequencies across positions","It uses only one shift","It encrypts numbers, not letters"],answer:1,explanation:"Because different positions use different shifts, the cipher flattens frequencies, defeating naive frequency analysis."},
+{q:"The Kasiski method helps an attacker determine what about a Vigen\u00E8re cipher?",options:["The plaintext language","The period (keyword length)","The encryption speed","The number of users"],answer:1,explanation:"Kasiski examines distances between repeated ciphertext sequences to deduce the period (keyword length)."},
+{q:"The Index of Coincidence is used to estimate what?",options:["The keyword's exact letters","The period of a polyalphabetic cipher","The encryption key size in bits","The number of rounds in DES"],answer:1,explanation:"The Index of Coincidence statistically estimates the period of a polyalphabetic cipher like Vigen\u00E8re."},
+{q:"Approximately what Index of Coincidence value is expected for random text?",options:["About 0.066","About 0.038","About 0.500","About 1.000"],answer:1,explanation:"Random text has an Index of Coincidence near 0.038, lower than the ~0.066 of monoalphabetic English."},
+{q:"What three conditions make a one-time pad achieve perfect secrecy?",options:["Short key, reused often, predictable","Truly random key, as long as the message, used once","Public key, fixed length, shared widely","56-bit key, 16 rounds, S-boxes"],answer:1,explanation:"A one-time pad is perfectly secret only if the key is truly random, at least as long as the message, and never reused."},
+{q:"Who proved that the one-time pad provides perfect secrecy?",options:["Rivest","Shannon","Kerckhoffs","Diffie"],answer:1,explanation:"Claude Shannon proved the one-time pad offers perfect (information-theoretic) secrecy."},
+{q:"Why is the one-time pad impractical for most real uses?",options:["It is mathematically breakable","The key must be as long as the message and never reused","It only works on numbers","It requires public keys"],answer:1,explanation:"The key-management burden \u2014 a truly random key as long as the message, used once, securely distributed \u2014 makes it impractical."},
+{q:"DES operates on plaintext blocks of what size?",options:["32 bits","64 bits","128 bits","256 bits"],answer:1,explanation:"DES is a block cipher that processes 64-bit blocks of data."},
+{q:"What is the effective key length of DES?",options:["40 bits","56 bits","112 bits","128 bits"],answer:1,explanation:"DES uses a 56-bit effective key (8 of the 64 key bits are parity)."},
+{q:"How many rounds does the DES algorithm use?",options:["8 rounds","16 rounds","24 rounds","32 rounds"],answer:1,explanation:"DES applies 16 rounds of its Feistel structure."},
+{q:"What is the main security weakness of DES today?",options:["Its block size is too large","Its 56-bit key is vulnerable to brute force","It has no S-boxes","It cannot be implemented in hardware"],answer:1,explanation:"The 56-bit key space is small enough that modern hardware can exhaustively search it."},
+{q:"What provides the non-linearity in each DES round?",options:["The parity bits","The substitution boxes (S-boxes)","The block size","The key length"],answer:1,explanation:"DES's S-boxes provide the non-linear substitution that gives the cipher its strength against linear analysis."},
+{q:"Why is ECB mode considered insecure for many messages?",options:["It chains every block together","Identical plaintext blocks produce identical ciphertext blocks","It uses a different key each block","It requires public keys"],answer:1,explanation:"In ECB, equal plaintext blocks map to equal ciphertext blocks, leaking structural patterns in the data."},
+{q:"Which mode chains blocks together using XOR to add diffusion?",options:["ECB mode","CBC mode","Raw mode","Identity mode"],answer:1,explanation:"CBC (Cipher Block Chaining) XORs each plaintext block with the previous ciphertext block, adding diffusion."},
+{q:"CBC mode is described as 'self-healing' because what happens after a transmission error?",options:["All later blocks stay corrupted","Decryption recovers after the affected blocks","The key changes automatically","The whole message is lost"],answer:1,explanation:"In CBC, an error affects only the corrupted block and the next, after which decryption recovers correctly."},
+{q:"What does 3DES (EDE) do to strengthen DES?",options:["Applies DES three times for a larger effective key","Removes the S-boxes","Shortens the key to 40 bits","Converts it to a hash function"],answer:0,explanation:"3DES applies the DES operation three times (encrypt-decrypt-encrypt), enlarging the effective key strength."},
+{q:"AES (Rijndael) uses a block size of what?",options:["64 bits","128 bits","56 bits","256 bits"],answer:1,explanation:"AES uses a fixed 128-bit block size."},
+{q:"Which key sizes does AES support?",options:["40, 56, or 64 bits","128, 192, or 256 bits","Only 56 bits","512 or 1024 bits"],answer:1,explanation:"AES supports key sizes of 128, 192, or 256 bits."},
+{q:"Structurally, how does AES differ from DES?",options:["AES is a Feistel network like DES","AES is a substitution-permutation network, not Feistel","AES uses no substitution at all","AES has only one round"],answer:1,explanation:"AES is a substitution-permutation network, whereas DES uses a Feistel structure."},
+{q:"In which year was public-key cryptography introduced by Diffie and Hellman?",options:["1956","1976","1990","2001"],answer:1,explanation:"Diffie and Hellman introduced public-key cryptography in 1976."},
+{q:"In public-key cryptography, what is true about the key pair?",options:["Both keys are kept secret","One key is public and the other private","Both keys are published","Only one shared key exists"],answer:1,explanation:"Each user has a public key (shared openly) and a private key (kept secret); they work as a matched pair."},
+{q:"To send a confidential message, you encrypt it with which key?",options:["Your own private key","The recipient's public key","A shared symmetric key only","The recipient's private key"],answer:1,explanation:"Encrypting with the recipient's public key means only their private key can decrypt it, ensuring confidentiality."},
+{q:"To prove a message came from you (authentication), you encrypt/sign with which key?",options:["The recipient's public key","Your own private key","A random session key","The recipient's private key"],answer:1,explanation:"Signing with your private key lets anyone verify the message with your public key, proving its origin."},
+{q:"On what mathematical problem does RSA's security rest?",options:["Sorting large lists","Factoring large numbers","Computing letter frequencies","Reversing a hash"],answer:1,explanation:"RSA's security depends on the difficulty of factoring the large modulus n into its prime factors."},
+{q:"In RSA, given primes p and q, how is the modulus n computed?",options:["n = p + q","n = p \u00D7 q","n = p \u2212 q","n = p / q"],answer:1,explanation:"In RSA, the modulus n is the product of the two primes: n = p \u00D7 q."},
+{q:"For RSA with p = 7 and q = 11, what is \u03C6(n)?",options:["77","60","18","70"],answer:1,explanation:"\u03C6(n) = (p\u22121)(q\u22121) = 6 \u00D7 10 = 60."},
+{q:"In RSA, the encryption of message m is computed how?",options:["c = m \u00D7 e mod n","c = m^e mod n","c = e^m mod n","c = m + e mod n"],answer:1,explanation:"RSA encryption raises the message to the public exponent: c = m^e mod n."},
+{q:"In RSA, decryption recovers the message using which formula?",options:["m = c \u00D7 d mod n","m = c^d mod n","m = d^c mod n","m = c + d mod n"],answer:1,explanation:"RSA decryption raises the ciphertext to the private exponent: m = c^d mod n."},
+{q:"For RSA with \u03C6(n) = 60 and public exponent e = 17, the private exponent d satisfies which relation?",options:["e + d = 60","e \u00D7 d \u2261 1 (mod 60)","d = 60 \u2212 e","d = e^2 mod 60"],answer:1,explanation:"The private exponent d is the modular inverse of e: e \u00D7 d \u2261 1 (mod \u03C6(n)); here d = 53 since 17\u00D753 \u2261 1 (mod 60)."},
+{q:"Why can the RSA public key (n, e) be shared openly without compromising security?",options:["Because n is never used","Because deriving d requires factoring n, which is infeasible","Because e is always secret","Because the message is never encrypted"],answer:1,explanation:"Recovering the private key requires \u03C6(n), which requires factoring n; for large n this is computationally infeasible."},
+{q:"What is the primary purpose of a cryptographic checksum (hash)?",options:["To hide a message's content","To protect and verify data integrity","To distribute secret keys","To compress files for storage"],answer:1,explanation:"A cryptographic hash produces a fixed-size digest used to detect changes, protecting integrity."},
+{q:"A defining property of a cryptographic hash function is that it is what?",options:["Easily reversible","One-way and collision-resistant","Dependent on a public key","Always 56 bits long"],answer:1,explanation:"Cryptographic hashes are one-way (hard to invert) and collision-resistant (hard to find two inputs with the same hash)."},
+{q:"What does an HMAC add compared to a plain hash?",options:["It compresses the message","It uses a secret key to verify integrity and authenticity","It encrypts the message reversibly","It removes the need for hashing"],answer:1,explanation:"HMAC combines a secret key with a hash, verifying both that data is unaltered and that it came from a key holder."},
+{q:"What is the key difference between hashing and encryption?",options:["Hashing is reversible; encryption is not","Encryption is reversible; hashing is one-way","Both are always reversible","Neither uses keys ever"],answer:1,explanation:"Encryption can be decrypted (reversible), while hashing is a one-way function that cannot be undone."},
+{q:"Diffie-Hellman specifically enables two parties to do what?",options:["Factor large numbers quickly","Agree on a shared secret over an insecure channel","Hash messages without a key","Break the one-time pad"],answer:1,explanation:"Diffie-Hellman key exchange lets two parties establish a shared secret even over an insecure channel."},
+{q:"Which statement best contrasts symmetric and public-key cryptography?",options:["Symmetric uses one shared key; public-key uses a key pair","Symmetric uses a key pair; public-key uses one shared key","Both use only public keys","Neither uses any keys"],answer:0,explanation:"Symmetric crypto uses a single shared secret key, while public-key crypto uses a matched public/private key pair."}
+];
+​
+window.QUESTIONS.final = [
+{q:"Which trio of properties is the foundation of information security?",options:["Confidentiality, Integrity, Availability","Authentication, Authorization, Auditing","People, Process, Technology","Detection, Response, Recovery"],answer:0,explanation:"The CIA triad \u2014 Confidentiality, Integrity, Availability \u2014 underlies all security goals."},
+{q:"A flood of traffic that prevents legitimate users from reaching a service attacks which property?",options:["Confidentiality","Availability","Integrity","Authenticity"],answer:1,explanation:"Denial-of-service attacks target availability by blocking legitimate access."},
+{q:"Which definition matches a vulnerability?",options:["A potential cause of harm","A weakness that can be exploited","The product of likelihood and impact","An asset of high value"],answer:1,explanation:"A vulnerability is a weakness that a threat can exploit, distinct from the threat itself."},
+{q:"Risk is best expressed as the combination of which two factors?",options:["Asset value and key length","Likelihood and impact","Threat and availability","Policy and mechanism"],answer:1,explanation:"Risk reflects how likely a harmful event is and how damaging it would be."},
+{q:"A firewall that blocks malicious packets before entry is which type of control?",options:["Preventive","Detective","Corrective","Administrative"],answer:0,explanation:"Preventive controls stop incidents before they occur, as a blocking firewall does."},
+{q:"Restoring data from backups after an attack exemplifies which control?",options:["Preventive","Detective","Corrective","Deterrent"],answer:2,explanation:"Corrective controls restore normal operation after an incident."},
+{q:"Security awareness training is best categorized as which kind of control?",options:["Physical","Administrative","Technical","Cryptographic"],answer:1,explanation:"Training is an administrative control \u2014 a policy/procedure guiding human behavior."},
+{q:"What does authentication establish, in contrast to authorization?",options:["What a user may do","Who a user is","When a session ends","Where data is stored"],answer:1,explanation:"Authentication verifies identity; authorization then decides what that identity may do."},
+{q:"The principle of least privilege recommends granting users what?",options:["Maximum possible access","Only the access they need","The same access as admins","Temporary full access"],answer:1,explanation:"Least privilege limits permissions to the minimum required, reducing potential damage."},
+{q:"Phishing primarily exploits which weakness?",options:["Weak encryption keys","Human trust and behavior","Slow network links","Database indexing flaws"],answer:1,explanation:"Phishing is social engineering that manipulates people rather than breaking technology."},
+{q:"Defense in depth is best described as which approach?",options:["A single strong barrier","Multiple layered, overlapping controls","Encrypting only key files","Trusting internal users fully"],answer:1,explanation:"Defense in depth layers controls so that one failure does not compromise the whole system."},
+{q:"A zero-trust model is built on which assumption?",options:["Internal users are always safe","No user or device is trusted by default","Firewalls are enough alone","Encryption replaces access checks"],answer:1,explanation:"Zero trust verifies every request regardless of origin, trusting nothing by default."},
+{q:"In the access-control model, a subject is best defined as what?",options:["A passive protected resource","An active entity performing operations","A permission in a cell","A rule limiting transitions"],answer:1,explanation:"A subject is an active entity (user, process, service) that initiates operations."},
+{q:"Which is an example of an object in access control?",options:["A process requesting access","A stored file being read","A user issuing a command","A service starting a transfer"],answer:1,explanation:"Objects are passive resources acted upon, such as a file being read."},
+{q:"Which classic right enables modification and thus threatens integrity if misused?",options:["Read","Write","Execute","Browse"],answer:1,explanation:"Write permits modification, so improper write access endangers integrity."},
+{q:"In the access-control matrix, rows and columns represent what, respectively?",options:["Objects and subjects","Subjects and objects","Rights and states","Keys and files"],answer:1,explanation:"Rows are subjects and columns are objects in the access-control matrix."},
+{q:"An access control list (ACL) corresponds to which part of the matrix?",options:["A row","A column","A diagonal","A single cell"],answer:1,explanation:"An ACL is organized per object, representing one column of the matrix."},
+{q:"A capability list corresponds to which part of the matrix?",options:["A column","A row","A header","A merged cell"],answer:1,explanation:"A capability list is organized per subject, representing one row of the matrix."},
+{q:"Which question is most directly answered by an ACL?",options:["What can this user access?","Who can access this object?","How many rights total exist?","When was a right revoked?"],answer:1,explanation:"Because ACLs list subjects per object, they answer 'who can access this object?'"},
+{q:"Why is the access-control matrix usually stored as ACLs or capability lists?",options:["The matrix is mostly empty (sparse)","The matrix cannot hold rights","Lists encrypt the data","Lists remove all subjects"],answer:0,explanation:"The matrix is sparse, so storing it directly wastes space; ACLs and capability lists are compact slices."},
+{q:"The safety problem asks whether a system can ever do what?",options:["Run out of storage","Leak a right to a subject that should not have it","Lose network connectivity","Expire a password"],answer:1,explanation:"The safety problem asks whether a particular right can ever leak to an unauthorized subject."},
+{q:"The HRU result showed that the general safety problem is what?",options:["Always solvable quickly","Undecidable","Independent of commands","Only about encryption"],answer:1,explanation:"Harrison-Ruzzo-Ullman proved that, in general, safety is undecidable."},
+{q:"Delegation in access control means a subject does what?",options:["Deletes another user","Grants a right it holds to another subject","Encrypts a file","Audits the logs"],answer:1,explanation:"Delegation passes a held permission to another subject, adding a matrix entry."},
+{q:"A subject can only delegate a right that it does what?",options:["Invents on the spot","Actually possesses","Borrows from the system","Has never held"],answer:1,explanation:"You cannot give away a permission you do not have; delegation is limited to held rights."},
+{q:"A security policy partitions system states into which two sets?",options:["Fast and slow","Authorized and unauthorized","Encrypted and plaintext","Public and private"],answer:1,explanation:"A policy separates states into authorized (secure) and unauthorized (non-secure)."},
+{q:"Which statement correctly separates policy from mechanism?",options:["Policy is the tool; mechanism is the goal","Policy is what is allowed; mechanism is how it is enforced","They are the same thing","Mechanism defines the goal"],answer:1,explanation:"Policy describes what is allowed; mechanism is the technique enforcing it."},
+{q:"A military (governmental) policy primarily aims to provide which property?",options:["Integrity","Confidentiality","Availability","Redundancy"],answer:1,explanation:"Military policies focus on confidentiality \u2014 preventing unauthorized disclosure."},
+{q:"A commercial policy primarily aims to provide which property?",options:["Confidentiality","Integrity","Anonymity","Availability"],answer:1,explanation:"Commercial policies focus on integrity \u2014 preventing unauthorized modification."},
+{q:"Under discretionary access control (DAC), who decides access?",options:["The system rules","The resource owner","The data's originator","A labeling authority"],answer:1,explanation:"DAC lets the resource owner decide access at their discretion."},
+{q:"Under mandatory access control (MAC), who enforces access?",options:["The resource owner","The system or organization","The originator","Each end user"],answer:1,explanation:"MAC enforces access through system/organization rules that users cannot override."},
+{q:"Under ORCON, who controls redistribution of information?",options:["The current holder","The originator who created it","The administrator","Any reader"],answer:1,explanation:"ORCON keeps redistribution control with the originator, even after sharing."},
+{q:"Why is policy ambiguity dangerous?",options:["It speeds enforcement","It lets rules be interpreted differently, creating gaps","It removes mechanisms","It guarantees security"],answer:1,explanation:"Ambiguous policies invite inconsistent interpretation, leaving exploitable gaps."},
+{q:"Why is trust an unavoidable part of security?",options:["Everything can be fully verified","At some point we rely on unverified assumptions","Trust removes vulnerabilities","Trust replaces policy"],answer:1,explanation:"Since not everything can be verified independently, security rests on some trusted assumptions."},
+{q:"A cryptosystem is formally a 5-tuple consisting of which elements?",options:["E, D, M, K, C","S, O, R, P, Q","C, I, A, P, M","P, Q, N, E, D"],answer:0,explanation:"A cryptosystem is (E, D, M, K, C): encryption, decryption, messages, keys, ciphertexts."},
+{q:"Kerckhoffs's principle says security should depend on what?",options:["The secrecy of the algorithm","The secrecy of the key","Hiding the ciphertext","Using short keys"],answer:1,explanation:"Security should rest only on the key, even if the algorithm is public."},
+{q:"The Caesar cipher encrypts using which formula?",options:["E_k(m) = (m + k) mod 26","E_k(m) = (m \u00D7 k) mod 26","E_k(m) = m^k mod 26","E_k(m) = (k \u2212 m) mod 26"],answer:0,explanation:"The Caesar cipher shifts each letter: E_k(m) = (m + k) mod 26."},
+{q:"Why is the Caesar cipher trivially broken?",options:["It uses a long random key","Only 25 non-zero shifts exist to try","It uses public keys","It changes keys each letter"],answer:1,explanation:"With only 25 possible shifts, brute force breaks it instantly."},
+{q:"The Vigen\u00E8re cipher is which type of cipher?",options:["Monoalphabetic substitution","Polyalphabetic substitution","Transposition","Asymmetric"],answer:1,explanation:"Vigen\u00E8re uses a repeating keyword for multiple shifts, making it polyalphabetic."},
+{q:"The Kasiski method and Index of Coincidence both help determine what?",options:["The plaintext meaning","The Vigen\u00E8re period (keyword length)","The DES key","The hash output"],answer:1,explanation:"Both techniques estimate the period of a polyalphabetic cipher like Vigen\u00E8re."},
+{q:"Which conditions make a one-time pad perfectly secret?",options:["Short reused key","Truly random key, as long as the message, used once","Public key pair","56-bit key over 16 rounds"],answer:1,explanation:"Perfect secrecy requires a truly random key, at least as long as the message, used only once."},
+{q:"What makes the one-time pad impractical despite being unbreakable?",options:["It is mathematically weak","Key length and distribution requirements","It only encrypts numbers","It needs a public key"],answer:1,explanation:"The key must be as long as the message, random, never reused, and securely shared \u2014 a heavy burden."},
+{q:"DES uses which block size and effective key length?",options:["128-bit block, 56-bit key","64-bit block, 56-bit key","64-bit block, 128-bit key","128-bit block, 256-bit key"],answer:1,explanation:"DES uses a 64-bit block and a 56-bit effective key."},
+{q:"What is DES's main weakness today?",options:["Its block is too large","Its 56-bit key is brute-forceable","It lacks any rounds","It cannot be implemented"],answer:1,explanation:"The 56-bit key space is small enough to brute force with modern hardware."},
+{q:"Why is ECB mode insecure for structured data?",options:["It chains all blocks","Identical plaintext blocks yield identical ciphertext blocks","It uses a new key per block","It requires public keys"],answer:1,explanation:"ECB reveals patterns because equal plaintext blocks produce equal ciphertext blocks."},
+{q:"AES (Rijndael) uses which block size?",options:["64 bits","128 bits","56 bits","512 bits"],answer:1,explanation:"AES uses a 128-bit block size."},
+{q:"Which key sizes are supported by AES?",options:["40, 56, 64","128, 192, 256","56 only","512, 1024"],answer:1,explanation:"AES supports 128-, 192-, and 256-bit keys."},
+{q:"Public-key cryptography was introduced by whom and when?",options:["Shannon, 1949","Diffie and Hellman, 1976","Rivest, 2001","Kerckhoffs, 1883"],answer:1,explanation:"Diffie and Hellman introduced public-key cryptography in 1976."},
+{q:"To ensure confidentiality, a sender encrypts with which key?",options:["Their own private key","The recipient's public key","A shared symmetric key only","The recipient's private key"],answer:1,explanation:"Encrypting with the recipient's public key ensures only they can decrypt it."},
+{q:"To authenticate the sender, a message is signed with which key?",options:["The recipient's public key","The sender's private key","A random session key","The recipient's private key"],answer:1,explanation:"Signing with the sender's private key lets anyone verify origin with the public key."},
+{q:"RSA's security relies on the difficulty of which problem?",options:["Sorting numbers","Factoring large numbers","Computing frequencies","Reversing a transposition"],answer:1,explanation:"RSA depends on the hardness of factoring the modulus n into its primes."},
+{q:"In RSA, the modulus n is computed as which of the following?",options:["n = p + q","n = p \u00D7 q","n = p \u2212 q","n = p^q"],answer:1,explanation:"RSA sets n = p \u00D7 q, the product of two primes."},
+{q:"For RSA with p = 7 and q = 11, what is \u03C6(n)?",options:["77","60","70","18"],answer:1,explanation:"\u03C6(n) = (7\u22121)(11\u22121) = 6 \u00D7 10 = 60."},
+{q:"In RSA, encryption is performed as which computation?",options:["c = m \u00D7 e mod n","c = m^e mod n","c = e^m mod n","c = m + e mod n"],answer:1,explanation:"RSA encryption computes c = m^e mod n."},
+{q:"What is the primary purpose of a cryptographic hash?",options:["To hide message content","To verify data integrity","To exchange secret keys","To compress files"],answer:1,explanation:"A cryptographic hash protects integrity by detecting any change to the data."},
+{q:"How does an HMAC differ from a plain hash?",options:["It compresses the message","It uses a secret key for integrity and authenticity","It encrypts reversibly","It removes hashing"],answer:1,explanation:"HMAC mixes a secret key with a hash, verifying both integrity and authenticity."},
+{q:"What is the core difference between hashing and encryption?",options:["Hashing is reversible; encryption is not","Encryption is reversible; hashing is one-way","Both are reversible","Neither uses keys"],answer:1,explanation:"Encryption can be decrypted; hashing is a one-way function."},
+{q:"Diffie-Hellman key exchange lets two parties do what?",options:["Factor numbers quickly","Agree on a shared secret over an insecure channel","Hash without a key","Break a one-time pad"],answer:1,explanation:"Diffie-Hellman establishes a shared secret over an insecure channel."},
+{q:"Which statement correctly contrasts symmetric and asymmetric cryptography?",options:["Symmetric uses a key pair; asymmetric uses one key","Symmetric uses one shared key; asymmetric uses a key pair","Both use only public keys","Neither uses any key"],answer:1,explanation:"Symmetric crypto uses one shared key; asymmetric (public-key) uses a public/private pair."},
+{q:"A process that initiates an operation and is also acted upon can be classified as what?",options:["Only an object","Both a subject and an object","Neither subject nor object","Only a right"],answer:1,explanation:"A process is a subject when it initiates and an object when acted upon, so it can be both."},
+{q:"Which overall idea best captures the relationship between policy and CIA?",options:["Policy ignores CIA entirely","A policy decides which CIA properties matter and defines secure states","CIA replaces the need for policy","Policy is only about availability"],answer:1,explanation:"A security policy chooses which of confidentiality, integrity, and availability matter and partitions states accordingly."}
+];
+window.QUESTIONS.ch4.push(
+{q:"Which statement about substitution versus transposition ciphers is correct?",options:["Both rearrange letter positions only","Substitution changes symbols; transposition reorders them","Both change the symbols themselves","Transposition uses a public key"],answer:1,explanation:"Substitution replaces each symbol with another, while transposition keeps the symbols but rearranges their positions."}
+);
+​
 </script>
 ​
 <script type="text/babel">
-try {
-  updateStatus('Compiling React app...');
-  
-  const {useState} = React;
-  
-  function App() {
-    const [ready, setReady] = useState(false);
-    
-    React.useEffect(() => {
-      setTimeout(() => {
-        document.getElementById('loading').style.display = 'none';
-        setReady(true);
-      }, 500);
-    }, []);
-    
-    if (!ready) return null;
-    
-    return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="hero-bg rounded-3xl px-8 py-14 text-center">
-            <h1 className="text-4xl font-extrabold text-slate-900">StudyMartin is Working!</h1>
-            <p className="text-lg text-slate-600 mt-4">The app loaded successfully.</p>
-            <p className="text-sm text-slate-500 mt-2">Chapters: {window.CHAPTERS?.length || 0}</p>
-            <p className="text-sm text-slate-500">Questions: {Object.keys(window.QUESTIONS || {}).length} sets</p>
+​
+const {useState,useEffect,useRef,useMemo} = React;
+​
+const CHAPTERS = window.CHAPTERS || [];
+const QUESTIONS = window.QUESTIONS || {};
+const LETTERS = ['A','B','C','D','E','F'];
+const FINAL_SECONDS = 45*60;
+​
+/* ---------------- storage ---------------- */
+const STORE_KEY='studymartin_v1';
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {scores:{},completed:{}}; }catch(e){ return {scores:{},completed:{}}; } }
+function saveStore(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+​
+/* ---------------- sound feedback ---------------- */
+let _actx=null;
+function beep(ok){ try{ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); const o=_actx.createOscillator(),g=_actx.createGain(); o.connect(g); g.connect(_actx.destination); o.type='sine'; o.frequency.value=ok?660:175; const t=_actx.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.28); o.start(t); o.stop(t+0.3); }catch(e){} }
+​
+/* ---------------- helpers ---------------- */
+function shuffle(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const tmp=r[i]; r[i]=r[j]; r[j]=tmp; } return r; }
+function fmtTime(s){ if(s<0) s=0; const m=Math.floor(s/60), sec=s%60; return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec; }
+function pct(n,d){ return d?Math.round((n/d)*100):0; }
+function chapterById(id){ return CHAPTERS.find(c=>c.id===id); }
+​
+/* ---------------- search text ---------------- */
+function sectionText(s){
+  let parts=[];
+  ['text','term','title','caption'].forEach(k=>{ if(s[k]) parts.push(s[k]); });
+  if(s.items) parts=parts.concat(s.items);
+  if(s.lines) parts=parts.concat(s.lines);
+  if(s.headers) parts=parts.concat(s.headers);
+  if(s.rows) s.rows.forEach(r=>{ parts=parts.concat(r); });
+  if(s.left){ if(s.left.title) parts.push(s.left.title); parts=parts.concat(s.left.points||[]); }
+  if(s.right){ if(s.right.title) parts.push(s.right.title); parts=parts.concat(s.right.points||[]); }
+  return parts.filter(Boolean).join('  ');
+}
+function sectionHeading(ch,i){ for(let j=i;j>=0;j--){ if(ch.sections[j].type==='h2') return ch.sections[j].text; } return ch.title; }
+​
+/* ---------------- highlight ---------------- */
+function highlight(text,q){
+  if(!q) return text;
+  try{
+    const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+    const parts=String(text).split(re);
+    return parts.map((p,i)=> (i%2===1)
+      ? <mark key={i} className="bg-amber-200 dark:bg-amber-400/40 rounded px-0.5">{p}</mark>
+      : <span key={i}>{p}</span>);
+  }catch(e){ return text; }
+}
+​
+/* ---------------- icons (SVG, no emoji) ---------------- */
+function Icon({name,className}){
+  const c=className||'w-5 h-5';
+  const paths={
+    home:'M3 11.5 12 4l9 7.5M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9',
+    book:'M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5zM18 3v16',
+    exam:'M9 4h6a1 1 0 0 1 1 1v0h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1a1 1 0 0 1 1-1zM9 12l2 2 4-4',
+    search:'M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm10 2-4.3-4.3',
+    sun:'M12 4V2m0 20v-2m8-8h2M2 12h2m13.66 5.66 1.41 1.41M4.93 4.93l1.41 1.41m0 11.32-1.41 1.41M19.07 4.93l-1.41 1.41M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+    moon:'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z',
+    clock:'M12 7v5l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z',
+    check:'M5 13l4 4L19 7',
+    x:'M6 6l12 12M18 6 6 18',
+    arrow:'M5 12h14m-6-6 6 6-6 6',
+    refresh:'M21 12a9 9 0 1 1-3-6.7M21 4v4h-4',
+    shuffle:'M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5',
+    shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+    lock:'M5 11a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1zM8 10V7a4 4 0 0 1 8 0v3',
+    key:'M14 7a4 4 0 1 0-3.9 5L4 18v2h2l1-1h2v-2h2v-2l1.1-1.1A4 4 0 0 0 14 7z',
+    clipboard:'M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 11h6M9 15h6',
+    bulb:'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.1V16h6v-.4c0-.8.4-1.5 1-2.1A6 6 0 0 0 12 3z',
+    info:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 7.5h.01',
+    alert:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8v5M12 16.5h.01',
+    warn:'M12 3l9 16H3L12 3zM12 10v4M12 17.5h.01',
+    beaker:'M9 3h6M10 3v6l-5 9a1 1 0 0 0 .9 1.5h12.2A1 1 0 0 0 19 18l-5-9V3',
+    sparkle:'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z',
+    trophy:'M8 4h8v4a4 4 0 0 1-8 0V4zM8 6H5a2 2 0 0 0 0 4h1M16 6h3a2 2 0 0 1 0 4h-1M10 14h4l-1 4h-2l-1-4zM8 21h8',
+    cap:'M22 9L12 5 2 9l10 4 10-4zM6 11v5c0 1 2.7 3 6 3s6-2 6-3v-5',
+    target:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+    bolt:'M13 2L4 14h7l-1 8 9-12h-7l1-8z'
+  };
+  return (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={c}><path d={paths[name]} /></svg>);
+}
+​
+const CHAP_ICON={ch1:'shield',ch2:'lock',ch3:'clipboard',ch4:'key'};
+function chapIcon(id){ return CHAP_ICON[id]||'book'; }
+​
+/* ---------------- progress bar ---------------- */
+function ProgressBar({value}){
+  const [w,setW]=useState(0);
+  const fillStyle={width:w+'%'};
+  useEffect(()=>{ const t=setTimeout(()=>setW(value),60); return ()=>clearTimeout(t); },[value]);
+  return (<div className="h-2.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-brand-400 to-cyan-400 transition-all duration-700" style={fillStyle}></div></div>);
+}
+​
+/* ---------------- callout tones ---------------- */
+const TONES={
+  important:{bd:'border-brand-400',bg:'bg-brand-50 dark:bg-brand-500/10',label:'Important',tx:'text-brand-700 dark:text-brand-300',icon:'alert'},
+  tip:{bd:'border-emerald-400',bg:'bg-emerald-50 dark:bg-emerald-500/10',label:'Tip',tx:'text-emerald-700 dark:text-emerald-300',icon:'bulb'},
+  example:{bd:'border-violet-400',bg:'bg-violet-50 dark:bg-violet-500/10',label:'Example',tx:'text-violet-700 dark:text-violet-300',icon:'beaker'},
+  note:{bd:'border-sky-400',bg:'bg-sky-50 dark:bg-sky-500/10',label:'Note',tx:'text-sky-700 dark:text-sky-300',icon:'info'},
+  warning:{bd:'border-rose-400',bg:'bg-rose-50 dark:bg-rose-500/10',label:'Warning',tx:'text-rose-700 dark:text-rose-300',icon:'warn'}
+};
+​
+/* ---------------- section renderer ---------------- */
+function Section({s}){
+  switch(s.type){
+    case 'intro':
+      return <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-300 border-l-4 border-brand-400 pl-4 my-6">{s.text}</p>;
+    case 'h2':
+      return <h2 className="text-2xl font-bold mt-10 mb-3 text-slate-900 dark:text-white scroll-mt-24">{s.text}</h2>;
+    case 'h3':
+      return <h3 className="text-lg font-semibold mt-6 mb-2 text-brand-700 dark:text-brand-300">{s.text}</h3>;
+    case 'p':
+      return <p className="my-3 leading-relaxed text-slate-700 dark:text-slate-300">{s.text}</p>;
+    case 'definition':
+      return (<div className="my-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4 flex gap-3"><Icon name="book" className="w-5 h-5 mt-0.5 flex-none text-brand-500" /><div><span className="font-semibold text-brand-700 dark:text-brand-300">{s.term}: </span><span className="text-slate-700 dark:text-slate-300">{s.text}</span></div></div>);
+    case 'list': {
+      return (<div className="my-4">{s.title && <div className="font-semibold mb-2 text-slate-800 dark:text-slate-100">{s.title}</div>}<ul className="space-y-2">{s.items.map((it,i)=>(<li key={i} className="flex gap-3 text-slate-700 dark:text-slate-300">{s.ordered ? <span className="flex-none w-5 h-5 mt-0.5 rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-300 text-xs font-bold grid place-items-center">{i+1}</span> : <span className="flex-none mt-2 w-1.5 h-1.5 rounded-full bg-brand-400"></span>}<span>{it}</span></li>))}</ul></div>);
+    }
+    case 'steps': {
+      return (<div className="my-5">{s.title && <div className="font-semibold mb-3 text-slate-800 dark:text-slate-100">{s.title}</div>}<ol className="space-y-3">{s.items.map((it,i)=>(<li key={i} className="flex gap-3"><span className="flex-none w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-cyan-500 text-white text-sm font-bold grid place-items-center shadow-sm">{i+1}</span><span className="pt-0.5 text-slate-700 dark:text-slate-300">{it}</span></li>))}</ol></div>);
+    }
+    case 'callout': case 'example': {
+      const tone = s.type==='example' ? TONES.example : (TONES[s.tone]||TONES.note);
+      const label = s.type==='example' ? 'Example' : tone.label;
+      return (<div className={'my-4 rounded-xl border-l-4 p-4 '+tone.bd+' '+tone.bg}><div className={'flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide mb-1 '+tone.tx}><Icon name={tone.icon} className="w-4 h-4" /><span>{label}{s.title?' · '+s.title:''}</span></div><div className="text-slate-700 dark:text-slate-200 leading-relaxed">{s.text}</div></div>);
+    }
+    case 'comparison':
+      return (<div className="my-5">{s.title && <div className="font-semibold mb-3 text-slate-800 dark:text-slate-100">{s.title}</div>}<div className="grid md:grid-cols-2 gap-4">{[s.left,s.right].map((col,ci)=>(<div key={ci} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4"><div className="font-semibold text-brand-700 dark:text-brand-300 mb-2">{col.title}</div><ul className="space-y-2">{(col.points||[]).map((p,pi)=>(<li key={pi} className="flex gap-2 text-sm text-slate-700 dark:text-slate-300"><span className="flex-none mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-400"></span><span>{p}</span></li>))}</ul></div>))}</div></div>);
+    case 'table':
+      return (<div className="my-5">{s.title && <div className="text-sm font-semibold mb-2 text-slate-500 dark:text-slate-400">{s.title}</div>}<div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800"><table className="w-full text-sm"><thead className="bg-brand-50 dark:bg-brand-500/10"><tr>{s.headers.map((h,i)=>(<th key={i} className="text-left font-semibold px-3 py-2 text-brand-800 dark:text-brand-200">{h}</th>))}</tr></thead><tbody>{s.rows.map((r,ri)=>(<tr key={ri} className="border-t border-slate-100 dark:border-slate-800 even:bg-slate-50/60 dark:even:bg-white/5">{r.map((c,ci)=>(<td key={ci} className="px-3 py-2 align-top text-slate-700 dark:text-slate-300">{c}</td>))}</tr>))}</tbody></table></div></div>);
+    case 'formula':
+      return (<div className="my-5 rounded-xl border border-brand-200 dark:border-brand-500/30 bg-brand-50/70 dark:bg-brand-500/10 p-4">{s.title && <div className="text-sm font-semibold mb-2 text-brand-700 dark:text-brand-300">{s.title}</div>}<pre className="font-mono text-sm whitespace-pre-wrap text-slate-800 dark:text-slate-100">{s.lines.join('\n')}</pre>{s.caption && <div className="text-xs mt-3 text-slate-500 dark:text-slate-400">{s.caption}</div>}</div>);
+    case 'summary':
+      return (<div className="my-8 rounded-2xl border border-brand-200 dark:border-brand-500/30 bg-gradient-to-br from-brand-50 to-cyan-50 dark:from-brand-500/10 dark:to-cyan-500/5 p-6"><div className="flex items-center gap-2 mb-3"><Icon name="check" className="w-5 h-5 text-brand-600 dark:text-brand-300" /><span className="font-bold text-lg text-slate-900 dark:text-white">{s.title}</span></div><ul className="space-y-2">{s.items.map((it,i)=>(<li key={i} className="flex gap-3 text-slate-700 dark:text-slate-200"><Icon name="check" className="w-4 h-4 mt-1 flex-none text-brand-500" /><span>{it}</span></li>))}</ul></div>);
+    default: return null;
+  }
+}
+​
+/* ---------------- sidebar ---------------- */
+function Sidebar({view,chId,go,open,setOpen}){
+  const items=[{v:'home',id:null,label:'Home',icon:'home'}];
+  CHAPTERS.forEach(c=>items.push({v:'chapter',id:c.id,label:'Chapter '+c.num,icon:chapIcon(c.id)}));
+  items.push({v:'final',id:null,label:'Final Exam',icon:'exam'});
+  const wrap='fixed md:static z-40 top-0 left-0 h-full w-64 shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col transition-transform duration-300 '+(open?'translate-x-0':'-translate-x-full md:translate-x-0');
+  return (<aside className={wrap}>
+    <div className="flex items-center gap-2.5 px-2 py-2 mb-4">
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 grid place-items-center text-white font-extrabold shadow-md">SM</div>
+      <div className="font-extrabold text-lg tracking-tight">Study<span className="gradient-text">Martin</span></div>
+    </div>
+    <nav className="space-y-1 flex-1">
+      {items.map((it,i)=>{ const active = it.v===view && (it.id?it.id===chId:true) && !(view==='chapter'&&it.v!=='chapter'); const isActive = (view===it.v) && ((it.v==='chapter') ? it.id===chId : true);
+        return (<button key={i} onClick={()=>{go(it.v,it.id); setOpen(false);}} className={'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition '+(isActive?'bg-brand-500 text-white shadow-sm':'text-slate-600 dark:text-slate-300 hover:bg-brand-50 dark:hover:bg-slate-800')}>
+          <Icon name={it.icon} className="w-5 h-5" />
+          <span className="truncate text-left">{it.label}</span>
+        </button>);
+      })}
+    </nav>
+    <div className="text-xs text-slate-400 px-3 pt-3 border-t border-slate-100 dark:border-slate-800">Computer &amp; Information Security</div>
+  </aside>);
+}
+​
+/* ---------------- topbar ---------------- */
+function Topbar({query,setQuery,go,dark,setDark,setOpen}){
+  return (<header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+    <div className="flex items-center gap-3 px-4 md:px-8 h-16">
+      <button className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" onClick={()=>setOpen(true)}><Icon name="book" /></button>
+      <div className="relative flex-1 max-w-xl">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon name="search" className="w-4 h-4" /></span>
+        <input value={query} onChange={e=>{ const v=e.target.value; setQuery(v); go(v?'search':'home'); }} placeholder="Search explanations and questions..." className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-transparent focus:border-brand-400 focus:bg-white dark:focus:bg-slate-900 outline-none text-sm transition" />
+        {query && <button onClick={()=>{setQuery('');go('home');}} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"><Icon name="x" className="w-4 h-4" /></button>}
+      </div>
+      <button onClick={()=>setDark(!dark)} className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-brand-100 dark:hover:bg-slate-800 transition" title="Toggle theme"><Icon name={dark?'sun':'moon'} className="w-5 h-5" /></button>
+    </div>
+  </header>);
+}
+​
+/* ---------------- home ---------------- */
+function Home({go,store}){
+  const totalQ = Object.keys(QUESTIONS).reduce((a,k)=>a+QUESTIONS[k].length,0);
+  const doneCount = CHAPTERS.filter(c=>store.completed[c.id]).length;
+  return (<div className="animate-fadeIn">
+    <div className="hero-bg rounded-3xl px-8 py-14 text-center relative overflow-hidden">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/10 text-xs font-semibold text-brand-700 dark:text-brand-200 mb-4"><Icon name="sparkle" className="w-4 h-4" />Network &amp; Information Security</div>
+      <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">Study smarter with <span className="gradient-text">StudyMartin</span></h1>
+      <p className="text-lg text-slate-600 dark:text-slate-300 mt-4 max-w-2xl mx-auto">Four chapters turned into complete, beginner-friendly study guides, plus {totalQ} practice questions with instant explanations and a timer on every quiz.</p>
+      <div className="mt-7 flex flex-wrap gap-3 justify-center">
+        <button onClick={()=>go('chapter','ch1')} className="px-5 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold shadow-md shadow-brand-500/20 transition">Start Chapter 1</button>
+        <button onClick={()=>go('final')} className="px-5 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:border-brand-400 transition">Take Final Exam</button>
+      </div>
+    </div>
+​
+    <div className="grid sm:grid-cols-3 gap-4 mt-8">
+      <StatCard icon="cap" label="Chapters" value={CHAPTERS.length} sub={doneCount+' completed'} />
+      <StatCard icon="target" label="Practice questions" value={totalQ} sub="50 per chapter" />
+      <StatCard icon="trophy" label="Final exam" value={(QUESTIONS.final||[]).length} sub="45-minute timer" />
+    </div>
+​
+    <h2 className="text-xl font-bold mt-10 mb-4">Chapters</h2>
+    <div className="grid md:grid-cols-2 gap-4">
+      {CHAPTERS.map((c,i)=>{ const sc=store.scores[c.id]; const stStyle={animationDelay:(i*70)+'ms'};
+        return (<div key={c.id} style={stStyle} className="animate-slideUp card-hover rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:shadow-xl hover:border-brand-300 dark:hover:border-brand-500/40">
+          <div className="flex items-start gap-4">
+            <div className="relative flex-none w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-cyan-400 text-white grid place-items-center shadow-md"><Icon name={chapIcon(c.id)} className="w-6 h-6" /><span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white text-brand-600 text-xs font-extrabold grid place-items-center shadow">{c.num}</span></div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-lg leading-snug">{c.title}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{c.subtitle}</div>
+              <div className="flex items-center gap-3 mt-3 text-xs text-slate-400"><span className="flex items-center gap-1"><Icon name="clock" className="w-4 h-4" />{c.readMins} min read</span><span>{QUESTIONS[c.id].length} questions</span>{sc && <span className="text-brand-600 dark:text-brand-300 font-semibold">Best {pct(sc.best,sc.total)}%</span>}</div>
+              <div className="flex gap-2 mt-4">
+                <button onClick={()=>go('chapter',c.id)} className="px-4 py-2 rounded-lg bg-brand-50 dark:bg-brand-500/15 text-brand-700 dark:text-brand-200 text-sm font-semibold hover:bg-brand-100 dark:hover:bg-brand-500/25 transition">Read</button>
+                <button onClick={()=>go('quiz',c.id)} className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition">Quiz</button>
+              </div>
+            </div>
           </div>
-          
-          <div className="mt-8 bg-white rounded-2xl p-6 shadow">
-            <h2 className="text-2xl font-bold mb-4">✓ All systems operational</h2>
-            <ul className="space-y-2 text-slate-700">
-              <li>✓ React loaded</li>
-              <li>✓ Data loaded</li>
-              <li>✓ Tailwind CSS working</li>
-              <li>✓ App rendered</li>
-            </ul>
-            <p className="mt-4 text-sm text-slate-500">If you see this message, the file is working correctly. The full app will be in the next version.</p>
-          </div>
+        </div>);
+      })}
+    </div>
+​
+    <div className="mt-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
+      <div className="flex items-center justify-between mb-4"><h2 className="text-xl font-bold">Your progress</h2><span className="text-sm text-slate-400">{doneCount}/{CHAPTERS.length} chapters done</span></div>
+      <div className="space-y-4">
+        {CHAPTERS.map(c=>{ const sc=store.scores[c.id]; return (<div key={c.id}><div className="flex justify-between text-sm mb-1"><span className="font-medium">Ch {c.num}. {c.title}</span><span className="text-slate-400">{sc?pct(sc.best,sc.total)+'%':'not attempted'}</span></div><ProgressBar value={sc?pct(sc.best,sc.total):0} /></div>); })}
+        {QUESTIONS.final && (()=>{ const sc=store.scores.final; return (<div><div className="flex justify-between text-sm mb-1"><span className="font-medium">Final Exam</span><span className="text-slate-400">{sc?pct(sc.best,sc.total)+'%':'not attempted'}</span></div><ProgressBar value={sc?pct(sc.best,sc.total):0} /></div>); })()}
+      </div>
+    </div>
+  </div>);
+}
+function StatCard({icon,label,value,sub}){
+  return (<div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"><div className="flex items-center gap-3"><div className="flex-none w-11 h-11 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 grid place-items-center"><Icon name={icon} className="w-6 h-6" /></div><div><div className="text-2xl font-extrabold text-brand-600 dark:text-brand-300 leading-none">{value}</div><div className="font-semibold text-sm mt-1">{label}</div></div></div><div className="text-xs text-slate-400 mt-2">{sub}</div></div>);
+}
+​
+/* ---------------- chapter view ---------------- */
+function ChapterView({ch,go,store}){
+  const sc=store.scores[ch.id];
+  return (<div className="animate-fadeIn max-w-3xl mx-auto">
+    <div className="flex items-center gap-3 mb-2"><div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-500 to-cyan-400 text-white grid place-items-center shadow-md"><Icon name={chapIcon(ch.id)} className="w-6 h-6" /></div><div className="text-sm text-brand-600 dark:text-brand-300 font-semibold">Chapter {ch.num}{sc?'  ·  Best '+pct(sc.best,sc.total)+'%':''}</div></div>
+    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{ch.title}</h1>
+    <p className="text-slate-500 dark:text-slate-400 mt-1">{ch.subtitle}</p>
+    <div className="flex flex-wrap gap-3 mt-5 mb-4">
+      <button onClick={()=>go('quiz',ch.id)} className="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition inline-flex items-center gap-2">Start the {ch.num===4?'':''}quiz ({QUESTIONS[ch.id].length} questions) <Icon name="arrow" className="w-4 h-4" /></button>
+      {ch.num<CHAPTERS.length && <button onClick={()=>go('chapter','ch'+(ch.num+1))} className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:border-brand-400 transition">Next chapter</button>}
+    </div>
+    <div className="h-px bg-slate-200 dark:bg-slate-800 my-2"></div>
+    <article>{ch.sections.map((s,i)=><Section key={i} s={s} />)}</article>
+    <div className="mt-10 rounded-2xl bg-brand-50 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/30 p-6 text-center">
+      <div className="font-bold text-lg">Ready to test yourself?</div>
+      <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Take the {QUESTIONS[ch.id].length}-question quiz for this chapter. A timer runs while you answer.</p>
+      <button onClick={()=>go('quiz',ch.id)} className="mt-4 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition">Start quiz</button>
+    </div>
+  </div>);
+}
+​
+/* ---------------- quiz view (timer always on) ---------------- */
+function QuizView({questions,title,subtitle,countdown,onComplete,onExit}){
+  const total=questions.length;
+  const [order,setOrder]=useState(()=>questions.map((_,i)=>i));
+  const [idx,setIdx]=useState(0);
+  const [picked,setPicked]=useState(null);
+  const [locked,setLocked]=useState(false);
+  const [answers,setAnswers]=useState({});
+  const [score,setScore]=useState(0);
+  const [done,setDone]=useState(false);
+  const [shuffled,setShuffled]=useState(false);
+  const [seconds,setSeconds]=useState(countdown||0);
+  const reported=useRef(false);
+​
+  const q=questions[order[idx]];
+​
+  function finish(){ setDone(true); }
+​
+  useEffect(()=>{ if(done) return undefined; const t=setInterval(()=>setSeconds(s=> countdown ? s-1 : s+1 ),1000); return ()=>clearInterval(t); },[done,countdown]);
+  useEffect(()=>{ if(countdown && !done && seconds<=0){ finish(); } },[seconds,countdown,done]);
+  useEffect(()=>{ if(done && !reported.current){ reported.current=true; if(onComplete) onComplete(score,total); } },[done]);
+​
+  function submit(){ if(locked||picked==null) return; setLocked(true); setAnswers(a=>{ const n={...a}; n[order[idx]]=picked; return n; }); if(picked===q.answer){ setScore(s=>s+1); beep(true); } else { beep(false); } }
+  function next(){ if(idx+1>=total){ finish(); return; } setIdx(idx+1); setPicked(null); setLocked(false); }
+  function restart(reshuffle){ const o=reshuffle?shuffle(questions.map((_,i)=>i)):questions.map((_,i)=>i); setOrder(o); setIdx(0); setPicked(null); setLocked(false); setAnswers({}); setScore(0); setDone(false); setShuffled(reshuffle); setSeconds(countdown||0); reported.current=false; }
+​
+  const timeUsed = countdown ? (countdown - seconds) : seconds;
+  const lowTime = countdown && seconds<=60 && !done;
+​
+  if(done){
+    const p=pct(score,total);
+    const good=p>=70;
+    return (<div className="animate-fadeIn max-w-2xl mx-auto">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center">
+        <div className="text-sm font-semibold text-slate-400">{title} · Results</div>
+        <div className={'mx-auto my-4 w-32 h-32 rounded-full grid place-items-center text-4xl font-extrabold '+(good?'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300':'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-300')}>{p}%</div>
+        <div className="text-lg font-bold">{score} / {total} correct</div>
+        <div className="text-sm text-slate-400 mt-1 inline-flex items-center gap-1"><Icon name="clock" className="w-4 h-4" /> Time used {fmtTime(timeUsed)}</div>
+        <div className="flex flex-wrap gap-3 justify-center mt-6">
+          <button onClick={()=>restart(false)} className="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition inline-flex items-center gap-2"><Icon name="refresh" className="w-4 h-4" />Retry</button>
+          <button onClick={()=>restart(true)} className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:border-brand-400 transition inline-flex items-center gap-2"><Icon name="shuffle" className="w-4 h-4" />Shuffle &amp; retry</button>
+          <button onClick={onExit} className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:border-brand-400 transition">Done</button>
         </div>
       </div>
-    );
+      <h3 className="font-bold text-lg mt-8 mb-3">Review all answers</h3>
+      <div className="space-y-3">
+        {order.map((qi,n)=>{ const qq=questions[qi]; const ua=answers[qi]; const correct=ua===qq.answer; return (
+          <div key={qi} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+            <div className="font-medium">{n+1}. {qq.q}</div>
+            <div className="mt-2 space-y-1 text-sm">{qq.options.map((op,oi)=>{ const isAns=oi===qq.answer; const isUser=oi===ua; return (<div key={oi} className={'px-3 py-1.5 rounded-lg '+(isAns?'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-medium':(isUser?'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300':'text-slate-600 dark:text-slate-300'))}>{LETTERS[oi]}. {op}{isAns?'  (correct)':''}{isUser&&!isAns?'  (your answer)':''}</div>); })}</div>
+            {ua===undefined && <div className="text-xs text-slate-400 mt-1">(not answered)</div>}
+            <div className="text-sm mt-2 text-slate-500 dark:text-slate-400"><span className="font-semibold text-brand-600 dark:text-brand-300">Why: </span>{qq.explanation}</div>
+          </div>); })}
+      </div>
+    </div>);
   }
-  
-  updateStatus('Mounting React app...');
-  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  updateStatus('App mounted successfully!');
-  
-} catch (error) {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('error').style.display = 'block';
-  document.getElementById('error').innerHTML = '<strong>React Error:</strong> ' + error.message + '<br><br>' + error.stack;
-  console.error('React error:', error);
+​
+  return (<div className="animate-fadeIn max-w-2xl mx-auto">
+    <div className="flex items-center justify-between mb-3">
+      <button onClick={onExit} className="text-sm text-slate-500 hover:text-brand-600 inline-flex items-center gap-1"><Icon name="x" className="w-4 h-4" />Exit</button>
+      <div className={'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold '+(lowTime?'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 animate-pop':'bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-200')}><Icon name="clock" className="w-4 h-4" />{countdown?fmtTime(seconds):fmtTime(seconds)}{countdown?' left':''}</div>
+    </div>
+    <div className="text-sm font-semibold text-brand-600 dark:text-brand-300">{title}</div>
+    <div className="flex justify-between items-center text-sm text-slate-400 mt-1 mb-2"><span>Question {idx+1} of {total}</span><span>Score {score}</span></div>
+    <ProgressBar value={pct(idx,total)} />
+​
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 mt-4">
+      <div className="text-lg font-semibold leading-snug">{q.q}</div>
+      <div className="mt-4 space-y-2.5">
+        {q.options.map((op,oi)=>{ let cls='border-slate-200 dark:border-slate-700 hover:border-brand-400 hover:bg-brand-50/50 dark:hover:bg-slate-800';
+          if(locked){ if(oi===q.answer) cls='border-emerald-400 bg-emerald-50 dark:bg-emerald-500/15'; else if(oi===picked) cls='border-rose-400 bg-rose-50 dark:bg-rose-500/15 animate-shake'; else cls='border-slate-200 dark:border-slate-800 opacity-60'; }
+          else if(oi===picked) cls='border-brand-500 bg-brand-50 dark:bg-brand-500/15';
+          return (<button key={oi} disabled={locked} onClick={()=>setPicked(oi)} className={'w-full text-left px-4 py-3 rounded-xl border-2 transition flex gap-3 items-start '+cls}><span className="flex-none w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-bold grid place-items-center mt-0.5">{LETTERS[oi]}</span><span>{op}</span></button>); })}
+      </div>
+      {locked && (<div className={'mt-4 rounded-xl p-4 '+(picked===q.answer?'bg-emerald-50 dark:bg-emerald-500/10':'bg-rose-50 dark:bg-rose-500/10')}><div className={'font-bold text-sm '+(picked===q.answer?'text-emerald-700 dark:text-emerald-300':'text-rose-700 dark:text-rose-300')}>{picked===q.answer?'Correct!':'Not quite — correct answer is '+LETTERS[q.answer]+'.'}</div><div className="text-sm text-slate-600 dark:text-slate-300 mt-1">{q.explanation}</div></div>)}
+      <div className="mt-5 flex justify-end gap-3">
+        {!locked && <button onClick={submit} disabled={picked==null} className={'px-5 py-2.5 rounded-xl font-semibold transition '+(picked==null?'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed':'bg-brand-500 hover:bg-brand-600 text-white')}>Submit</button>}
+        {locked && <button onClick={next} className="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition inline-flex items-center gap-2">{idx+1>=total?'Finish':'Next'}<Icon name="arrow" className="w-4 h-4" /></button>}
+      </div>
+    </div>
+  </div>);
 }
+​
+/* ---------------- search view ---------------- */
+function SearchView({query,go}){
+  const ql=query.trim().toLowerCase();
+  const res=useMemo(()=>{ if(!ql) return {content:[],qs:[]};
+    const content=[]; const qs=[];
+    CHAPTERS.forEach(ch=>{ ch.sections.forEach((s,i)=>{ const t=sectionText(s); if(t && t.toLowerCase().includes(ql)){ content.push({chId:ch.id,chNum:ch.num,heading:sectionHeading(ch,i),text:t}); } }); });
+    Object.keys(QUESTIONS).forEach(k=>{ QUESTIONS[k].forEach(qq=>{ const blob=(qq.q+' '+qq.options.join(' ')+' '+qq.explanation); if(blob.toLowerCase().includes(ql)){ qs.push({set:k,q:qq}); } }); });
+    return {content:content.slice(0,40),qs:qs.slice(0,30)};
+  },[ql]);
+  const setLabel=k=>k==='final'?'Final Exam':('Chapter '+(chapterById(k)?chapterById(k).num:k));
+  return (<div className="animate-fadeIn max-w-3xl mx-auto">
+    <h1 className="text-2xl font-bold">Search results</h1>
+    <p className="text-slate-400 text-sm mt-1">{res.content.length+res.qs.length} matches for “{query}”</p>
+    {res.content.length>0 && <h2 className="font-bold mt-6 mb-2">In study guides</h2>}
+    <div className="space-y-2">{res.content.map((r,i)=>(<button key={i} onClick={()=>go('chapter',r.chId)} className="block w-full text-left rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 hover:border-brand-400 transition"><div className="text-xs font-semibold text-brand-600 dark:text-brand-300">Chapter {r.chNum} · {r.heading}</div><div className="text-sm text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">{highlight(r.text.slice(0,240),query)}</div></button>))}</div>
+    {res.qs.length>0 && <h2 className="font-bold mt-6 mb-2">In questions</h2>}
+    <div className="space-y-2">{res.qs.map((r,i)=>(<div key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"><div className="text-xs font-semibold text-brand-600 dark:text-brand-300">{setLabel(r.set)}</div><div className="text-sm font-medium mt-1">{highlight(r.q.q,query)}</div><div className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">{LETTERS[r.q.answer]}. {r.q.options[r.q.answer]}</div></div>))}</div>
+    {res.content.length===0 && res.qs.length===0 && <div className="text-center text-slate-400 py-16">No matches. Try another term.</div>}
+  </div>);
+}
+​
+/* ---------------- app ---------------- */
+function App(){
+  const [view,setView]=useState('home');
+  const [chId,setChId]=useState('ch1');
+  const [dark,setDark]=useState(()=>{ try{ return localStorage.getItem('studymartin_dark')==='1'; }catch(e){ return false; } });
+  const [store,setStore]=useState(loadStore);
+  const [query,setQuery]=useState('');
+  const [open,setOpen]=useState(false);
+​
+  useEffect(()=>{ const el=document.documentElement; if(dark) el.classList.add('dark'); else el.classList.remove('dark'); try{ localStorage.setItem('studymartin_dark',dark?'1':'0'); }catch(e){} },[dark]);
+​
+  function recordScore(id,score,total){ setStore(prev=>{ const s={scores:Object.assign({},prev.scores),completed:Object.assign({},prev.completed)}; const old=s.scores[id]||{best:0,last:0,total:total}; s.scores[id]={best:Math.max(old.best,score),last:score,total:total}; s.completed[id]=true; saveStore(s); return s; }); }
+  function go(v,id){ setView(v); if(id) setChId(id); if(v!=='search'){ /* keep query for search only */ } window.scrollTo(0,0); }
+​
+  const ch=chapterById(chId)||CHAPTERS[0];
+  let content;
+  if(view==='home') content=<Home go={go} store={store} />;
+  else if(view==='chapter') content=<ChapterView ch={ch} go={go} store={store} />;
+  else if(view==='quiz') content=<QuizView key={chId} questions={QUESTIONS[chId]} title={'Chapter '+ch.num+' Quiz'} countdown={0} onComplete={(sc,tot)=>recordScore(chId,sc,tot)} onExit={()=>go('chapter',chId)} />;
+  else if(view==='final') content=<QuizView key="final" questions={QUESTIONS.final} title="Final Exam" countdown={FINAL_SECONDS} onComplete={(sc,tot)=>recordScore('final',sc,tot)} onExit={()=>go('home')} />;
+  else if(view==='search') content=<SearchView query={query} go={go} />;
+​
+  return (<div className="flex min-h-screen">
+    {open && <div className="fixed inset-0 bg-black/30 z-30 md:hidden" onClick={()=>setOpen(false)}></div>}
+    <Sidebar view={view} chId={chId} go={go} open={open} setOpen={setOpen} />
+    <div className="flex-1 min-w-0 flex flex-col">
+      <Topbar query={query} setQuery={setQuery} go={go} dark={dark} setDark={setDark} setOpen={setOpen} />
+      <main className="flex-1 px-4 md:px-8 py-8 max-w-5xl w-full mx-auto">{content}</main>
+      <footer className="px-8 py-6 text-center text-xs text-slate-400 border-t border-slate-200 dark:border-slate-800">StudyMartin · Introduction to Computer Security (Matt Bishop) · Progress saved in your browser</footer>
+    </div>
+  </div>);
+}
+​
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+​
 </script>
 </body>
 </html>
